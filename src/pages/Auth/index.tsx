@@ -7,6 +7,7 @@ import {
   InputRightElement,
   Stack,
   Text,
+  useColorMode,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import React from "react";
@@ -14,15 +15,16 @@ import React from "react";
 const AuthPage = () => {
   const [show, setShow] = React.useState(false);
   const handleClick = () => setShow(!show);
+  const { colorMode } = useColorMode();
 
   return (
     <div>
       <Box
         padding="4"
-        bg="#FFF"
+        border={"1px solid"}
         color="black"
         maxW="md"
-        minW={"400px"}
+        minW={"350px"}
         height={"250px"}
         borderRadius={"5px"}
         display={"flex"}
@@ -43,17 +45,19 @@ const AuthPage = () => {
           alignItems={"center"}
           justifyContent={"center"}
         >
-          <Input placeholder="Basic usage" />
+          <Input placeholder="Basic usage" variant={"border"} />
           <InputGroup size="md">
             <Input
               pr="4.5rem"
               type={show ? "text" : "password"}
               placeholder="Enter password"
+              variant={"border"}
             />
             <InputRightElement width="2.5rem">
               <IconButton
                 h="1.75rem"
                 size="sm"
+                variant={"primary"}
                 background={"transparent!important"}
                 onClick={handleClick}
                 icon={show ? <ViewOffIcon /> : <ViewIcon />}
@@ -67,6 +71,8 @@ const AuthPage = () => {
             h="1.75rem"
             size="sm"
             title="ingresar al dashboard"
+            color={"white"}
+            bg={colorMode === "light" ? "primary" : "secondary"}
           >
             Ingresar
           </Button>

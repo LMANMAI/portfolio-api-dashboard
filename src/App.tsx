@@ -4,28 +4,26 @@ import {
   ChakraBaseProvider,
   ColorModeProvider,
   Container,
+  Icon,
   useColorMode,
 } from "@chakra-ui/react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthPage, OverviewPage } from "./pages";
-import theme from "../customTheme";
+import theme from "./theme/customTheme";
+import { BsFillSunFill, BsMoonFill } from "react-icons/bs";
 function App() {
   const currentUser: string = "asd";
   const { colorMode, toggleColorMode } = useColorMode();
 
-  console.log(colorMode);
   return (
     <ChakraBaseProvider theme={theme}>
-      <ColorModeProvider>
+      <ColorModeProvider value={colorMode}>
         <Box width="100vw" height="100vh">
           <Container
             maxW="100%"
             height="100%"
             centerContent
             justifyContent={"center"}
-            background={
-              colorMode === "dark" ? theme.colors.primary : theme.colors.bgColor
-            }
           >
             <BrowserRouter>
               <Routes>
@@ -33,8 +31,20 @@ function App() {
                 <Route path="/" element={<OverviewPage />} />
               </Routes>
             </BrowserRouter>
-            <Button onClick={toggleColorMode}>
-              {colorMode === "light" ? "Dark Mode" : "Light Mode"}
+            <Button
+              onClick={toggleColorMode}
+              position={"absolute"}
+              bottom={"10px"}
+              right={"10px"}
+              variant={"primary"}
+              bg={colorMode === "light" ? "primary" : "secondary"}
+              color={"white"}
+            >
+              {colorMode === "light" ? (
+                <Icon as={BsMoonFill} />
+              ) : (
+                <Icon as={BsFillSunFill} />
+              )}
             </Button>
           </Container>
         </Box>

@@ -1,25 +1,34 @@
-import { mode, darken, whiten } from "@chakra-ui/theme-tools";
-
 export const ButtonStyles = {
   baseStyle: {},
   sizes: {},
   variants: {
-    primary: (props: any) => ({
-      bg: mode(darken("primary", 0), whiten("secondary", 0))(props),
-      color: "white",
-      _hover: {
-        bg: mode(darken("primary", 10), whiten("secondary", 10))(props), // Ajusta la intensidad del color en hover según el modo
+    Button: {
+      baseStyle: {
+        fontWeight: "bold",
+        borderRadius: "md",
+        _focus: { boxShadow: "none" },
       },
-      border: "1px solid",
-      padding: "10px",
-    }),
-    secondary: (props: any) => ({
-      bg: "transparent",
-      border: " 1px solid",
-      borderColor: mode(darken("primary", 0), whiten("secondary", 0))(props),
-      color: mode(darken("primary", 0), whiten("secondary", 0))(props),
-      padding: "10px",
-    }),
+      variants: {
+        primary: (props: any) => ({
+          bg: props.colorMode === "light" ? "primary" : "secondary",
+          color: "white",
+          _hover: {
+            bg:
+              props.colorMode === "light"
+                ? "primaryLigther"
+                : "secondaryLigther",
+          },
+        }),
+        secondary: (props: any) => ({
+          bg: "transparent",
+          borderColor: props.colorMode === "light" ? "primary" : "secondary",
+          color: props.colorMode === "light" ? "primary" : "secondary",
+          _hover: {
+            bg: props.colorMode === "light" ? "third" : "third",
+          },
+        }),
+      },
+    },
   },
   defaultProps: {},
 };
