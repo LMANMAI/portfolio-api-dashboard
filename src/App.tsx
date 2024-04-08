@@ -1,34 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
-
+import {
+  Box,
+  Button,
+  ChakraBaseProvider,
+  ColorModeProvider,
+  Container,
+  useColorMode,
+} from "@chakra-ui/react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthPage, OverviewPage } from "./pages";
+import theme from "../customTheme";
 function App() {
-  const [count, setCount] = useState(0)
+  const currentUser: string = "asd";
+  const { colorMode, toggleColorMode } = useColorMode();
 
+  console.log(colorMode);
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+    <ChakraBaseProvider theme={theme}>
+      <ColorModeProvider>
+        <Box width="100vw" height="100vh">
+          <Container
+            maxW="100%"
+            height="100%"
+            centerContent
+            justifyContent={"center"}
+            background={
+              colorMode === "dark" ? theme.colors.primary : theme.colors.bgColor
+            }
+          >
+            <BrowserRouter>
+              <Routes>
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/" element={<OverviewPage />} />
+              </Routes>
+            </BrowserRouter>
+            <Button onClick={toggleColorMode}>
+              {colorMode === "light" ? "Dark Mode" : "Light Mode"}
+            </Button>
+          </Container>
+        </Box>
+      </ColorModeProvider>
+    </ChakraBaseProvider>
+  );
 }
-
-export default App
+export default App;
