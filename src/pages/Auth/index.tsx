@@ -10,10 +10,48 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import React from "react";
+import { useState } from "react";
+import { signInUser } from "../../config/firebase-config";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../features/authenticationSlice";
+import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
+  const [load, setLoad] = useState<boolean>(false);
+  const [formFields, setFormFields] = useState({
+    email: "",
+    password: "",
+  });
+  const { email, password } = formFields;
+  const dispatch = useDispatch();
+  const location = useNavigate();
+
+  const resetFormFields = () => {
+    return setFormFields({
+      email: "",
+      password: "",
+    });
+  };
+
+  const handleSubmit = async () => {
+    setLoad(true);
+    try {
+      const userCredential = await signInUser(email, password);
+      if (userCredential) {
+        dispatch(setUser(userCredential.user));
+        resetFormFields();
+        setLoad(false);
+        location("/");
+      }
+    } catch (error: any) {
+      setLoad(false);
+    }
+  };
+  const handleChange = (value: any, fieldName: string) => {
+    setFormFields({ ...formFields, [fieldName]: value });
+  };
+
   const handleClick = () => setShow(!show);
   const { colorMode } = useColorMode();
 
@@ -21,7 +59,7 @@ const AuthPage = () => {
     <div>
       <Box
         padding="4"
-        border={"1px solid"}
+        border={"1px solid #dbdbdb"}
         color="black"
         maxW="md"
         minW={"350px"}
@@ -30,6 +68,7 @@ const AuthPage = () => {
         display={"flex"}
         justifyContent={"center"}
         flexDirection={"column"}
+        bg={"#ebebeb"}
       >
         <Text
           textAlign={"center"}
@@ -45,13 +84,20 @@ const AuthPage = () => {
           alignItems={"center"}
           justifyContent={"center"}
         >
-          <Input placeholder="Basic usage" variant={"border"} />
+          <Input
+            placeholder="Basic usage"
+            variant={"border"}
+            value={email}
+            onChange={(value) => handleChange(value.target.value, "email")}
+          />
           <InputGroup size="md">
             <Input
               pr="4.5rem"
               type={show ? "text" : "password"}
               placeholder="Enter password"
               variant={"border"}
+              value={password}
+              onChange={(value) => handleChange(value.target.value, "password")}
             />
             <InputRightElement width="2.5rem">
               <IconButton
@@ -72,6 +118,7 @@ const AuthPage = () => {
             size="sm"
             title="ingresar al dashboard"
             color={"white"}
+            onClick={() => handleSubmit()}
             bg={colorMode === "light" ? "primary" : "secondary"}
           >
             Ingresar
