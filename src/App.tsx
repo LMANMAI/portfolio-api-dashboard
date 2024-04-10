@@ -7,29 +7,22 @@ import {
   Icon,
   useColorMode,
 } from "@chakra-ui/react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthPage, OverviewPage } from "./pages";
 import theme from "./theme/customTheme";
 import { BsFillSunFill, BsMoonFill } from "react-icons/bs";
-import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { handleLogoutUser, setUser } from "./features/authenticationSlice";
-import { userStateListener } from "./config/firebase-config";
-import PrivateComponent from "./routes/privateComponent";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "./context/authContext";
 
 function App() {
   const { colorMode, toggleColorMode } = useColorMode();
-  const dispatch = useDispatch();
-  const user = useSelector((state: any) => state.authentication.user);
-
+  const { currentUser } = useContext(AuthContext);
   useEffect(() => {
-    if (!user && window.location.pathname !== "/") {
+    if (!currentUser && window.location.pathname !== "/") {
       window.location.replace("/");
       return;
     }
-  }, [user, window.location.pathname]);
-
-  console.log(user);
+  }, [currentUser, window.location.pathname]);
   return (
     <ChakraBaseProvider theme={theme}>
       <ColorModeProvider value={colorMode}>
@@ -46,17 +39,10 @@ function App() {
           >
             <BrowserRouter>
               <Routes>
-                {!user ? (
-                  <Route path="/auth" element={<AuthPage />} />
+                {!currentUser ? (
+                  <Route path="/" element={<AuthPage />} />
                 ) : (
-                  <Route
-                    path="/"
-                    element={
-                      <PrivateComponent userId={user}>
-                        <OverviewPage />
-                      </PrivateComponent>
-                    }
-                  />
+                  <Route path="/" element={<OverviewPage />} />
                 )}
               </Routes>
             </BrowserRouter>

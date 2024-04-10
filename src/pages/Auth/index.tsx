@@ -13,7 +13,6 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { signInUser } from "../../config/firebase-config";
 import { useDispatch } from "react-redux";
-import { setUser } from "../../features/authenticationSlice";
 import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
@@ -24,7 +23,6 @@ const AuthPage = () => {
     password: "",
   });
   const { email, password } = formFields;
-  const dispatch = useDispatch();
   const location = useNavigate();
 
   const resetFormFields = () => {
@@ -39,7 +37,6 @@ const AuthPage = () => {
     try {
       const userCredential = await signInUser(email, password);
       if (userCredential) {
-        dispatch(setUser(userCredential.user));
         resetFormFields();
         setLoad(false);
         location("/");
@@ -119,6 +116,8 @@ const AuthPage = () => {
             title="ingresar al dashboard"
             color={"white"}
             onClick={() => handleSubmit()}
+            isDisabled={load}
+            isLoading={load}
             bg={colorMode === "light" ? "primary" : "secondary"}
           >
             Ingresar
