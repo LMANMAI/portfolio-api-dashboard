@@ -88,7 +88,7 @@ const AuthPage = () => {
           justifyContent={"center"}
         >
           <Input
-            placeholder="Basic usage"
+            placeholder="Correo electronico"
             variant={"border"}
             value={email}
             onChange={(value) => handleChange(value.target.value, "email")}
@@ -97,7 +97,7 @@ const AuthPage = () => {
             <Input
               pr="4.5rem"
               type={show ? "text" : "password"}
-              placeholder="Enter password"
+              placeholder="Contraseña"
               variant={"border"}
               value={password}
               onChange={(value) => handleChange(value.target.value, "password")}
