@@ -1,6 +1,7 @@
 import { User } from "firebase/auth";
 import { SignOutUser, userStateListener } from "../config/firebase-config";
 import { createContext, useState, useEffect, ReactNode } from "react";
+import { useToast } from "@chakra-ui/react";
 
 export const AuthContext = createContext({
   currentUser: {} as User | null,
@@ -10,7 +11,6 @@ export const AuthContext = createContext({
 
 export const AuthProvider = ({ children }: { children?: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-
   useEffect(() => {
     const unsubscribe = userStateListener((user) => {
       if (user) {
@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }: { children?: ReactNode }) => {
   const signOut = () => {
     SignOutUser();
     setCurrentUser(null);
+
     window.location.replace("/");
   };
 

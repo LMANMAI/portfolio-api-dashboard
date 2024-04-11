@@ -8,14 +8,15 @@ import {
   Stack,
   Text,
   useColorMode,
+  useToast,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { signInUser } from "../../config/firebase-config";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
+  const toast = useToast();
   const [show, setShow] = useState(false);
   const [load, setLoad] = useState<boolean>(false);
   const [formFields, setFormFields] = useState({
@@ -40,6 +41,11 @@ const AuthPage = () => {
         resetFormFields();
         setLoad(false);
         location("/");
+        toast({
+          title: `Ingresando a la cuenta`,
+          position: "top-right",
+          isClosable: true,
+        });
       }
     } catch (error: any) {
       setLoad(false);

@@ -24,6 +24,8 @@ export const userStateListener = (callback: NextOrObserver<User>) => {
 };
 
 export const SignOutUser = async () => {
-  window.location.replace("/");
+  setTimeout(() => {
+    window.location.replace("/");
+  }, 750);
   await signOut(auth);
 };
