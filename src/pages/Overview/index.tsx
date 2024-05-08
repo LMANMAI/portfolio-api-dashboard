@@ -15,7 +15,7 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from "@chakra-ui/react";
-import AddContent from "../../containers/AddContent";
+import { AddContent, MyProyects } from "../../containers";
 import { BsFillDoorOpenFill } from "react-icons/bs";
 import { SignOutUser } from "../../config/firebase-config";
 
@@ -33,38 +33,18 @@ const OverviewPage = () => {
       border={"1px solid #d8d8d8"}
       borderRadius={"5px"}
     >
-      <Accordion defaultIndex={[0]} allowToggle marginY={4}>
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box flex="1" textAlign="left">
-                Ingresar datos
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel p={0} marginY={4}>
-            <AddContent />
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-
       <Tabs isFitted variant="enclosed">
         <TabList>
-          <Tab>Agregar proyecto</Tab>
           <Tab>Mis proyectos</Tab>
           <Tab>Habilidades-Herramientas</Tab>
         </TabList>
 
         <TabPanels>
           <TabPanel>
-            <p>one!</p>
+            <MyProyects />
           </TabPanel>
           <TabPanel>
             <p>two!</p>
-          </TabPanel>
-          <TabPanel>
-            <p>three!</p>
           </TabPanel>
         </TabPanels>
       </Tabs>

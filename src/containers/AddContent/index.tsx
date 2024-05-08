@@ -58,10 +58,8 @@ const AddContent = () => {
               </MenuButton>
               <Portal>
                 <MenuList>
-                  <MenuItem>Menu 1</MenuItem>
-                  <MenuItem>New Window</MenuItem>
-                  <MenuItem>Open Closed Tab</MenuItem>
-                  <MenuItem>Open File</MenuItem>
+                  <MenuItem>Eliminar imagen</MenuItem>
+                  <MenuItem>Limpiar proyecto</MenuItem>
                 </MenuList>
               </Portal>
             </Menu>
