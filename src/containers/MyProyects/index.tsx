@@ -7,75 +7,53 @@ import {
   CardFooter,
   Text,
   Button,
-  Drawer,
-  DrawerBody,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  useDisclosure,
+  useColorMode,
 } from "@chakra-ui/react";
-import React from "react";
-
+import { mockData } from "./static";
+import { ToDo } from "../../interfaces";
 const MyProyects = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = React.useRef();
+  const { colorMode } = useColorMode();
 
   return (
     <SimpleGrid
       spacing={4}
-      templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+      templateColumns={{
+        base: "repeat(auto-fill, minmax(45%, 1fr))",
+        md: "repeat(auto-fill, minmax(30%, 1fr))",
+      }}
+      overflow={"hidden"}
+      overflowY={"auto"}
+      height={"75dvh"}
+      padding={"10px"}
     >
-      <Card>
-        <CardHeader>
-          <Heading size="md"> Customer dashboard</Heading>
-        </CardHeader>
-        <CardBody>
-          <Text>View a summary of all your customers over the last month.</Text>
-        </CardBody>
-        <CardFooter>
-          <Button onClick={onOpen}>View here</Button>
-        </CardFooter>
-      </Card>
-      <Card>
-        <CardHeader>
-          <Heading size="md"> Customer dashboard</Heading>
-        </CardHeader>
-        <CardBody>
-          <Text>View a summary of all your customers over the last month.</Text>
-        </CardBody>
-        <CardFooter>
-          <Button onClick={onOpen}>View here</Button>
-        </CardFooter>
-      </Card>
-      <Card>
-        <CardHeader>
-          <Heading size="md"> Customer dashboard</Heading>
-        </CardHeader>
-        <CardBody>
-          <Text>View a summary of all your customers over the last month.</Text>
-        </CardBody>
-        <CardFooter>
-          <Button onClick={onOpen}>View here</Button>
-        </CardFooter>
-      </Card>
-      <Drawer isOpen={isOpen} placement="right" onClose={onClose} size={"md"}>
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>Proyect Detail</DrawerHeader>
-
-          <DrawerBody></DrawerBody>
-
-          <DrawerFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
-              Cancel
+      {mockData.map((item: ToDo) => (
+        <Card bg={colorMode === "light" ? "bgLigthtMode" : "bgDarkMode"}>
+          <CardHeader padding={"10px"}>
+            <Heading
+              fontSize={"34px"}
+              letterSpacing={"1.325px"}
+              fontFamily={"ChocoBold"}
+              textTransform={"capitalize"}
+            >
+              {item.name}
+            </Heading>
+          </CardHeader>
+          <CardBody padding={"10px"}>
+            <Text fontSize={"13px"}>{item.description}</Text>
+          </CardBody>
+          <CardFooter padding={"10px"} justifyContent={"end"}>
+            <Button
+              fontWeight={"400"}
+              fontSize={"14px"}
+              variant={"primary"}
+              onClick={() => console.log("")}
+              color={colorMode === "light" ? "primary" : "secondary"}
+            >
+              Ver detalle
             </Button>
-            <Button>Save</Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+          </CardFooter>
+        </Card>
+      ))}
     </SimpleGrid>
   );
 };

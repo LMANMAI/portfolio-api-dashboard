@@ -5,6 +5,7 @@ import {
   ColorModeProvider,
   Container,
   Icon,
+  Stack,
   useColorMode,
 } from "@chakra-ui/react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -46,21 +47,28 @@ function App() {
                 )}
               </Routes>
             </BrowserRouter>
-            <Button
-              onClick={toggleColorMode}
-              position={"absolute"}
-              bottom={"10px"}
-              right={"10px"}
-              variant={"primary"}
-              bg={colorMode === "light" ? "primary" : "secondary"}
-              color={"white"}
+
+            <Stack
+              direction={"row"}
+              w={"85%"}
+              justifyContent={"end"}
+              margin={"15px 0px"}
             >
-              {colorMode === "light" ? (
-                <Icon as={BsMoonFill} />
-              ) : (
-                <Icon as={BsFillSunFill} />
-              )}
-            </Button>
+              <div style={{ width: "48px", height: "40px" }}></div>{" "}
+              <div style={{ width: "48px", height: "40px" }}></div>
+              <Button
+                onClick={toggleColorMode}
+                variant={"primary"}
+                bg={colorMode === "light" ? "primary" : "secondary"}
+                color={"white"}
+              >
+                {colorMode === "light" ? (
+                  <Icon as={BsMoonFill} />
+                ) : (
+                  <Icon as={BsFillSunFill} />
+                )}
+              </Button>
+            </Stack>
           </Container>
         </Box>
       </ColorModeProvider>

@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Icon,
   IconButton,
   Input,
   InputGroup,
@@ -14,9 +15,12 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { signInUser } from "../../config/firebase-config";
 import { useNavigate } from "react-router-dom";
+import { BsFillSunFill, BsMoonFill } from "react-icons/bs";
 
 const AuthPage = () => {
   const toast = useToast();
+  const { colorMode, toggleColorMode } = useColorMode();
+
   const [show, setShow] = useState(false);
   const [load, setLoad] = useState<boolean>(false);
   const [formFields, setFormFields] = useState({
@@ -56,11 +60,16 @@ const AuthPage = () => {
   };
 
   const handleClick = () => setShow(!show);
-  const { colorMode } = useColorMode();
 
   return (
-    <div>
-      <Box
+    <Box
+      w={"85%"}
+      h={"85dvh"}
+      display={"flex"}
+      alignItems={"center"}
+      justifyContent={"center"}
+    >
+      <Stack
         padding="4"
         border={"1px solid #dbdbdb"}
         color="black"
@@ -76,8 +85,10 @@ const AuthPage = () => {
         <Text
           textAlign={"center"}
           marginY={"10px"}
-          letterSpacing={"0.2px"}
-          textTransform={"uppercase"}
+          textTransform={"capitalize"}
+          fontFamily={"ChocoBold"}
+          fontSize={"34px"}
+          letterSpacing={"1.325px"}
         >
           Portfolio dashboard
         </Text>
@@ -129,8 +140,8 @@ const AuthPage = () => {
             Ingresar
           </Button>
         </Stack>
-      </Box>
-    </div>
+      </Stack>
+    </Box>
   );
 };
 

@@ -4,9 +4,9 @@ import { mode } from "@chakra-ui/theme-tools";
 
 const colors = {
   backgroundPrimaryColor: "#FAFAFA",
-  primary: "#780000",
+  primary: "#003049",
   primaryLigther: "#c1121f",
-  secondary: "#003049",
+  secondary: "#9E3131",
   secondaryLigther: "#669bbc",
   third: "#fdf0d5",
   bgLigthtMode: "#f2f2f2",
