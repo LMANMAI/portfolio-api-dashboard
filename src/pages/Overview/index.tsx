@@ -18,8 +18,16 @@ import {
   DrawerCloseButton,
   useDisclosure,
   Stack,
+  Input,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  FormHelperText,
+  NumberInputField,
+  Textarea,
+  Select,
 } from "@chakra-ui/react";
-import { MyProyects } from "../../containers";
+import { MyProyects, SkillsAndTools } from "../../containers";
 import { BsFillDoorOpenFill, BsPlusSquareFill } from "react-icons/bs";
 import { SignOutUser } from "../../config/firebase-config";
 import React from "react";
@@ -70,7 +78,7 @@ const OverviewPage = () => {
             <MyProyects />
           </TabPanel>
           <TabPanel padding={"10px 5px"}>
-            <p>two!</p>
+            <SkillsAndTools />
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -115,7 +123,82 @@ const OverviewPage = () => {
           <DrawerCloseButton />
           <DrawerHeader>Agregar Proyecto</DrawerHeader>
 
-          <DrawerBody></DrawerBody>
+          <DrawerBody>
+            <FormControl>
+              <div
+                style={{ display: "flex", gap: "10px", margin: "2.5px 0px" }}
+              >
+                <div style={{ width: "100%" }}>
+                  <FormLabel>Nombre del proyecto</FormLabel>
+                  <Input placeholder="Basic usage" />{" "}
+                </div>
+                <div style={{ width: "100%" }}>
+                  <FormLabel>Url del proyecto</FormLabel>
+                  <Input placeholder="Basic usage" />{" "}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "10px", margin: "5px 0px" }}>
+                <div style={{ width: "100%" }}>
+                  <FormLabel>Url del repositorio</FormLabel>
+                  <Input placeholder="Basic usage" />{" "}
+                </div>
+
+                <div style={{ width: "100%" }}>
+                  <FormLabel>Tipo de proyecto</FormLabel>
+                  <Select size="md" w={"100%"} placeholder="Select option">
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <option value="option3">Option 3</option>
+                  </Select>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "10px", margin: "5px 0px" }}>
+                <div style={{ width: "100%" }}>
+                  <FormLabel>Tecnologias</FormLabel>
+                  <Select
+                    isMulti
+                    size="md"
+                    w={"100%"}
+                    placeholder="Select option"
+                  >
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <option value="option3">Option 3</option>
+                  </Select>
+                </div>
+              </div>
+              <div style={{ margin: "10px 0px" }}>
+                <FormLabel>Descripcion del proyecto</FormLabel>
+                <Textarea
+                  resize={"none"}
+                  placeholder="Here is a sample placeholder"
+                />
+              </div>
+            </FormControl>
+            <Stack
+              flexDirection={"row"}
+              justifyContent={"end"}
+              alignItems={"end"}
+            >
+              <Button
+                variant="outline"
+                mr={3}
+                onClick={onClose}
+                borderColor={colorMode === "light" ? "primary" : "secondary"}
+                borderWidth={"3px"}
+                //color={colorMode === "light" ? "primary" : "secondary"}
+              >
+                Agregar descripcion adicional
+              </Button>
+              <Button
+                variant={"primary"}
+                color={"white"}
+                bg={colorMode === "light" ? "primary" : "secondary"}
+              >
+                Agregar imagen
+              </Button>
+            </Stack>
+          </DrawerBody>
 
           <DrawerFooter>
             <Button

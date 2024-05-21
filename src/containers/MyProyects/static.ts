@@ -1,5 +1,6 @@
 export const mockData = [
   {
+    id: 0,
     name: "Panelify",
     productionUrl: "https://proyecto1.com",
     repositoryUrl: "https://github.com/usuario/proyecto1",
@@ -14,6 +15,7 @@ export const mockData = [
     ],
   },
   {
+    id: 1,
     name: "Panelify API",
     productionUrl: "https://proyecto2.com",
     repositoryUrl: "https://github.com/usuario/proyecto2",
@@ -28,6 +30,7 @@ export const mockData = [
     ],
   },
   {
+    id: 2,
     name: "Sneaker Hub",
     productionUrl: "https://proyecto3.com",
     repositoryUrl: "https://github.com/usuario/proyecto3",
@@ -42,6 +45,7 @@ export const mockData = [
     ],
   },
   {
+    id: 3,
     name: "Sneaker Hub API",
     productionUrl: "https://proyecto4.com",
     repositoryUrl: "https://github.com/usuario/proyecto4",
@@ -56,6 +60,7 @@ export const mockData = [
     ],
   },
   {
+    id: 4,
     name: "MovieFlix",
     productionUrl: "https://proyecto5.com",
     repositoryUrl: "https://github.com/usuario/proyecto5",
@@ -70,6 +75,7 @@ export const mockData = [
     ],
   },
   {
+    id: 5,
     name: "pokedex",
     productionUrl: "https://proyecto6.com",
     repositoryUrl: "https://github.com/usuario/proyecto6",
@@ -84,6 +90,7 @@ export const mockData = [
     ],
   },
   {
+    id: 6,
     name: "burger API",
     productionUrl: "https://proyecto7.com",
     repositoryUrl: "https://github.com/usuario/proyecto7",
@@ -98,6 +105,7 @@ export const mockData = [
     ],
   },
   {
+    id: 7,
     name: "disney clone",
     productionUrl: "https://proyecto8.com",
     repositoryUrl: "https://github.com/usuario/proyecto8",
@@ -112,6 +120,7 @@ export const mockData = [
     ],
   },
   {
+    id: 8,
     name: "burger landing",
     productionUrl: "https://proyecto9.com",
     repositoryUrl: "https://github.com/usuario/proyecto9",
@@ -126,6 +135,7 @@ export const mockData = [
     ],
   },
   {
+    id: 9,
     name: "Sneaker hub dashboard",
     productionUrl: "https://proyecto10.com",
     repositoryUrl: "https://github.com/usuario/proyecto10",

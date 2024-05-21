@@ -88,9 +88,8 @@ const AuthPage = () => {
           textTransform={"capitalize"}
           fontFamily={"ChocoBold"}
           fontSize={"34px"}
-          letterSpacing={"1.325px"}
         >
-          Portfolio dashboard
+          Portfolio
         </Text>
         <Stack
           spacing={3}

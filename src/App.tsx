@@ -9,7 +9,7 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthPage, OverviewPage } from "./pages";
+import { AuthPage, OverviewPage, DetailPage } from "./pages";
 import theme from "./theme/customTheme";
 import { BsFillSunFill, BsMoonFill } from "react-icons/bs";
 import { useContext, useEffect } from "react";
@@ -43,7 +43,10 @@ function App() {
                 {!currentUser ? (
                   <Route path="/" element={<AuthPage />} />
                 ) : (
-                  <Route path="/" element={<OverviewPage />} />
+                  <>
+                    <Route path="/" element={<OverviewPage />} />
+                    <Route path=":id" element={<DetailPage />} />
+                  </>
                 )}
               </Routes>
             </BrowserRouter>

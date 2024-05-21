@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { mockData } from "./static";
 import { ToDo } from "../../interfaces";
+import { Link } from "react-router-dom";
 const MyProyects = () => {
   const { colorMode } = useColorMode();
 
@@ -31,7 +32,6 @@ const MyProyects = () => {
           <CardHeader padding={"10px"}>
             <Heading
               fontSize={"34px"}
-              letterSpacing={"1.325px"}
               fontFamily={"ChocoBold"}
               textTransform={"capitalize"}
             >
@@ -42,7 +42,7 @@ const MyProyects = () => {
             <Text fontSize={"13px"}>{item.description}</Text>
           </CardBody>
           <CardFooter padding={"10px"} justifyContent={"end"}>
-            <Button
+            {/* <Button
               fontWeight={"400"}
               fontSize={"14px"}
               variant={"primary"}
@@ -50,7 +50,8 @@ const MyProyects = () => {
               color={colorMode === "light" ? "primary" : "secondary"}
             >
               Ver detalle
-            </Button>
+            </Button> */}
+            <Link to={`/${item.id}`}>Ver detalle</Link>
           </CardFooter>
         </Card>
       ))}
