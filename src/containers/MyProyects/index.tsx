@@ -22,6 +22,10 @@ const MyProyects = () => {
         base: "repeat(auto-fill, minmax(45%, 1fr))",
         md: "repeat(auto-fill, minmax(30%, 1fr))",
       }}
+      templateRows={{
+        base: "repeat(auto-fill, minmax(250px, 1fr))",
+        md: "repeat(auto-fill, minmax(250px, 1fr))",
+      }}
       overflow={"hidden"}
       overflowY={"auto"}
       height={"75dvh"}

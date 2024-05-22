@@ -26,6 +26,7 @@ import {
   NumberInputField,
   Textarea,
   Select,
+  Tag,
 } from "@chakra-ui/react";
 import { MyProyects, SkillsAndTools } from "../../containers";
 import { BsFillDoorOpenFill, BsPlusSquareFill } from "react-icons/bs";
@@ -125,6 +126,19 @@ const OverviewPage = () => {
 
           <DrawerBody>
             <FormControl>
+              <Stack
+                flexDirection={"row"}
+                justifyContent={"end"}
+                alignItems={"end"}
+              >
+                <Button
+                  variant={"primary"}
+                  color={"white"}
+                  bg={colorMode === "light" ? "primary" : "secondary"}
+                >
+                  Agregar imagen
+                </Button>
+              </Stack>
               <div
                 style={{ display: "flex", gap: "10px", margin: "2.5px 0px" }}
               >
@@ -155,12 +169,13 @@ const OverviewPage = () => {
               <div style={{ display: "flex", gap: "10px", margin: "5px 0px" }}>
                 <div style={{ width: "100%" }}>
                   <FormLabel>Tecnologias</FormLabel>
-                  <Select
-                    isMulti
-                    size="md"
-                    w={"100%"}
-                    placeholder="Select option"
+                  <div
+                    style={{ display: "flex", gap: "10px", margin: "10px 0px" }}
                   >
+                    <Tag>Sample Tag</Tag>
+                    <Tag>Sample Tag</Tag>
+                  </div>
+                  <Select size="md" w={"100%"} placeholder="Select option">
                     <option value="option1">Option 1</option>
                     <option value="option2">Option 2</option>
                     <option value="option3">Option 3</option>
@@ -175,32 +190,19 @@ const OverviewPage = () => {
                 />
               </div>
             </FormControl>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"end"}
-              alignItems={"end"}
-            >
-              <Button
-                variant="outline"
-                mr={3}
-                onClick={onClose}
-                borderColor={colorMode === "light" ? "primary" : "secondary"}
-                borderWidth={"3px"}
-                //color={colorMode === "light" ? "primary" : "secondary"}
-              >
-                Agregar descripcion adicional
-              </Button>
-              <Button
-                variant={"primary"}
-                color={"white"}
-                bg={colorMode === "light" ? "primary" : "secondary"}
-              >
-                Agregar imagen
-              </Button>
-            </Stack>
           </DrawerBody>
 
           <DrawerFooter>
+            {/* <Button
+              variant="outline"
+              mr={3}
+              onClick={onClose}
+              borderColor={colorMode === "light" ? "primary" : "secondary"}
+              borderWidth={"3px"}
+              //color={colorMode === "light" ? "primary" : "secondary"}
+            >
+              Agregar descripcion adicional
+            </Button> */}
             <Button
               variant="outline"
               mr={3}
