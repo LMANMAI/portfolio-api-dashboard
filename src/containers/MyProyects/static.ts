@@ -4,14 +4,13 @@ export const mockData = [
     name: "Panelify",
     productionUrl: "https://proyecto1.com",
     repositoryUrl: "https://github.com/usuario/proyecto1",
-    technologyStack: ["React", "Node.js"],
+    technologyStack: ["React", "Redux"],
     posterPath: "/ruta/a/poster1.png",
-    proyectType: "Web",
+    proyectType: "Front_End",
     description:
       "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,1",
     aditionalData: [
       { text: "Dato adicional 1 del Proyecto 1", img: "/ruta/a/imagen1.png" },
-      { text: "Dato adicional 2 del Proyecto 1", img: "/ruta/a/imagen2.png" },
     ],
   },
   {
@@ -21,7 +20,7 @@ export const mockData = [
     repositoryUrl: "https://github.com/usuario/proyecto2",
     technologyStack: ["Vue", "Express"],
     posterPath: "/ruta/a/poster2.png",
-    proyectType: "Web",
+    proyectType: "Front_End",
     description:
       "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,2",
     aditionalData: [
@@ -36,7 +35,7 @@ export const mockData = [
     repositoryUrl: "https://github.com/usuario/proyecto3",
     technologyStack: ["Angular", "MongoDB"],
     posterPath: "/ruta/a/poster3.png",
-    proyectType: "Web",
+    proyectType: "Front_End",
     description:
       "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,3",
     aditionalData: [
@@ -51,7 +50,7 @@ export const mockData = [
     repositoryUrl: "https://github.com/usuario/proyecto4",
     technologyStack: ["React", "Firebase"],
     posterPath: "/ruta/a/poster4.png",
-    proyectType: "Web",
+    proyectType: "Front_End",
     description:
       "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,4",
     aditionalData: [
@@ -66,7 +65,7 @@ export const mockData = [
     repositoryUrl: "https://github.com/usuario/proyecto5",
     technologyStack: ["Vue", "Django"],
     posterPath: "/ruta/a/poster5.png",
-    proyectType: "Web",
+    proyectType: "Front_End",
     description:
       "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,5",
     aditionalData: [
@@ -81,7 +80,7 @@ export const mockData = [
     repositoryUrl: "https://github.com/usuario/proyecto6",
     technologyStack: ["Angular", "Firebase"],
     posterPath: "/ruta/a/poster6.png",
-    proyectType: "Web",
+    proyectType: "Front_End",
     description:
       "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,6",
     aditionalData: [
@@ -96,7 +95,7 @@ export const mockData = [
     repositoryUrl: "https://github.com/usuario/proyecto7",
     technologyStack: ["React", "Express"],
     posterPath: "/ruta/a/poster7.png",
-    proyectType: "Web",
+    proyectType: "Back_End",
     description:
       "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,7",
     aditionalData: [
@@ -111,7 +110,7 @@ export const mockData = [
     repositoryUrl: "https://github.com/usuario/proyecto8",
     technologyStack: ["Vue", "MongoDB"],
     posterPath: "/ruta/a/poster8.png",
-    proyectType: "Web",
+    proyectType: "Back_End",
     description:
       "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,8",
     aditionalData: [
@@ -126,7 +125,7 @@ export const mockData = [
     repositoryUrl: "https://github.com/usuario/proyecto9",
     technologyStack: ["Angular", "Django"],
     posterPath: "/ruta/a/poster9.png",
-    proyectType: "Web",
+    proyectType: "Back_End",
     description:
       "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,9",
     aditionalData: [
@@ -141,7 +140,7 @@ export const mockData = [
     repositoryUrl: "https://github.com/usuario/proyecto10",
     technologyStack: ["React", "Express"],
     posterPath: "/ruta/a/poster10.png",
-    proyectType: "Web",
+    proyectType: "Back_End",
     description:
       "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,10",
     aditionalData: [
