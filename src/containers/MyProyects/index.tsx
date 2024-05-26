@@ -46,15 +46,6 @@ const MyProyects = () => {
             <Text fontSize={"13px"}>{item.description}</Text>
           </CardBody>
           <CardFooter padding={"10px"} justifyContent={"end"}>
-            {/* <Button
-              fontWeight={"400"}
-              fontSize={"14px"}
-              variant={"primary"}
-              onClick={() => console.log("")}
-              color={colorMode === "light" ? "primary" : "secondary"}
-            >
-              Ver detalle
-            </Button> */}
             <Link to={`/${item.id}`}>Ver detalle</Link>
           </CardFooter>
         </Card>
