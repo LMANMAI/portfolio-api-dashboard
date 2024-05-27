@@ -1,15 +1,12 @@
 import {
   Card,
-  CardBody,
   CardFooter,
   CardHeader,
   Heading,
   SimpleGrid,
   Tag,
-  Text,
   useColorMode,
 } from "@chakra-ui/react";
-import React from "react";
 import { ToDo } from "../../interfaces";
 
 import { mockData } from "./static";

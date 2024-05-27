@@ -32,15 +32,12 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
   );
   const [image, setImage] = useState<string | null>(null);
   const [proyect, setProyect] = useState<ToDo>({
-    name: "Panelify",
-    productionUrl: "https://proyecto1.com",
-    repositoryUrl: "https://github.com/usuario/proyecto1",
-    technologyStack: ["React", "Redux"],
-    proyectType: "Front_End",
-    description:
-      "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,1",
+    name: "",
+    productionUrl: "",
+    repositoryUrl: "",
+    proyectType: "",
+    description: "",
   });
-
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target;
     const alreadyIncluded = technologiesSelected.includes(value);
@@ -51,7 +48,6 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
         technologiesSelected.filter((item: string) => item !== value)
       );
   };
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -59,6 +55,14 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
     }
+  };
+
+  const handleChangeProyect = (event: ToDo) => {
+    const { value, name } = event.target;
+    setProyect((prevProyect: ToDo) => ({
+      ...prevProyect,
+      [name]: value,
+    }));
   };
   return (
     <Drawer isOpen={isOpen} placement="right" onClose={onClose} size={"md"}>
@@ -69,6 +73,7 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
 
         <DrawerBody>
           <FormControl>
+            {/*Boton para agregar imagen*/}
             <Stack
               flexDirection={"row"}
               justifyContent={"end"}
@@ -94,9 +99,15 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
                 color={"white"}
                 width={"100%"}
                 h={"100%"}
-                _hover={!image ? {} : { opacity: 0.5 }}
+                _hover={{ opacity: 0.5 }}
+                flexDirection={"column"}
               >
                 <Icon fontSize={30} as={BsPlusSquareFill} />
+                <FormLabel fontSize={"13px"} m={2}>
+                  {!image
+                    ? "Agregar portada del proyecto"
+                    : "Cambiar imagen del proyecto"}
+                </FormLabel>
                 <input
                   type="file"
                   ref={inputRef}
@@ -130,22 +141,43 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
             <div style={{ display: "flex", gap: "10px", margin: "2.5px 0px" }}>
               <div style={{ width: "100%" }}>
                 <FormLabel>Nombre del proyecto</FormLabel>
-                <Input placeholder="Nombre del proyecto" />
+                <Input
+                  name="name"
+                  value={proyect.name}
+                  onChange={(e) => handleChangeProyect(e)}
+                  placeholder="Nombre del proyecto"
+                />
               </div>
               <div style={{ width: "100%" }}>
                 <FormLabel>Url del proyecto</FormLabel>
-                <Input placeholder="https://url.vercel.com" />
+                <Input
+                  name="productionUrl"
+                  value={proyect.productionUrl}
+                  onChange={(e) => handleChangeProyect(e)}
+                  placeholder="https://url.vercel.com"
+                />
               </div>
             </div>
             <div style={{ display: "flex", gap: "10px", margin: "5px 0px" }}>
               <div style={{ width: "100%" }}>
                 <FormLabel>Url del repositorio</FormLabel>
-                <Input placeholder="https://github.com/LMANMAI" />
+                <Input
+                  name="repositoryUrl"
+                  value={proyect.repositoryUrl}
+                  onChange={(e) => handleChangeProyect(e)}
+                  placeholder="https://github.com/LMANMAI"
+                />
               </div>
 
               <div style={{ width: "100%" }}>
                 <FormLabel>Tipo de proyecto</FormLabel>
-                <Select size="md" w={"100%"} placeholder="Seleccion un tipo">
+                <Select
+                  size="md"
+                  w={"100%"}
+                  name={"proyectType"}
+                  onChange={(e) => handleChangeProyect(e)}
+                  placeholder="Seleccion un tipo"
+                >
                   <option value="option1">Option 1</option>
                   <option value="option2">Option 2</option>
                   <option value="option3">Option 3</option>
@@ -179,6 +211,9 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
               <FormLabel>Descripcion del proyecto</FormLabel>
               <Textarea
                 resize={"none"}
+                name="description"
+                value={proyect.description}
+                onChange={(e) => handleChangeProyect(e)}
                 placeholder="Descripción de lo desarrollado."
               />
             </div>
@@ -203,7 +238,8 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
             color={"white"}
             bg={colorMode === "light" ? "primary" : "secondary"}
             onClick={() => {
-              setTechnologiesSelected([]);
+              //setTechnologiesSelected([]);
+              console.log(proyect, "proyect");
             }}
           >
             Guardar
