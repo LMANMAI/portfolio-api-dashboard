@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, Method } from "axios";
 
-type AllowedMethods = "get" | "post" | "put" | "del";
+type AllowedMethods = "get" | "post" | "put" | "delete";
 interface useFetchOptions {
   useInitialFetch?: boolean;
   method?: AllowedMethods;
@@ -27,12 +27,11 @@ export default function useFetch<T>(
   );
   const [errorMessage, setErrorMessage] = useState<AxiosError>();
 
-  let cancelToken = useRef(false);
+  const cancelToken = useRef(false);
 
   // Sets default values in the options object
   options = {
     ...options,
-    api: options && (options.api || "bff"),
     method: options.method || "get",
     successMessage: options.successMessage || "Success",
   };
@@ -41,26 +40,36 @@ export default function useFetch<T>(
     async (requestOptions?: Omit<useFetchOptions, "useInitialFetch">) => {
       setIsLoading(true);
       const { method, successMessage } = options;
-      let response = undefined;
-      let tokenUser = sessionStorage.getItem("userLoginData_TOKENSILENT") || "";
-      // Makes the http request
+      let response;
+
+      // Mapeo de métodos permitidos a los métodos de Axios
+      const axiosMethods: Record<AllowedMethods, Method> = {
+        get: "get",
+        post: "post",
+        put: "put",
+        delete: "delete",
+      };
+
       try {
-        const httpMethod = method as AllowedMethods; // Hacemos esto para aclarar que no van a existir valores undefined
-        response = await axios[httpMethod](url, {
+        const httpMethod = axiosMethods[method as AllowedMethods];
+        response = await axios.request({
+          url: `${import.meta.env.VITE_URL_BACKEND}/${url}`,
+          method: httpMethod,
           ...options,
           ...requestOptions,
           data: requestOptions?.data || options?.data,
           headers: {
             id_channel: "sucursal",
-            Token: tokenUser,
+            ...options.headers,
+            ...requestOptions?.headers,
           },
         });
+
         setData(response.data);
         setIsLoading(false);
       } catch (err) {
         const error = err as AxiosError;
         const errorResponse = err as ErrorType;
-        // La siguiente exepcion no deberia mostrar una pantalla de error
         if (
           errorResponse.response.data?.errors[0] &&
           errorResponse.response.data.errors[0].message !==
@@ -73,24 +82,22 @@ export default function useFetch<T>(
             errorResponse.response?.data.errors &&
             errorResponse.response?.data.errors[0]
           ) {
+            // Handle specific errors here if needed
           }
         }
       }
     },
-    []
+    [options, url]
   );
 
   useEffect(() => {
     if (!cancelToken.current && options.useInitialFetch) {
-      // va a llamar al makeRequest
       makeRequest();
     }
     return () => {
       cancelToken.current = true;
     };
-
-    // eslint-disable-next-line
-  }, [url, options.useInitialFetch]);
+  }, [makeRequest, options.useInitialFetch]);
 
   return { data, isLoading, errorMessage, makeRequest };
 }

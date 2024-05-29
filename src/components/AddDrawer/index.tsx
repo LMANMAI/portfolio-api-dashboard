@@ -20,6 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { ToDo } from "../../interfaces";
 import { BsPlusSquareFill } from "react-icons/bs";
+import useFetch from "../../hooks/useFetch";
 const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
   isOpen,
   onClose,
@@ -38,6 +39,7 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
     proyectType: "",
     description: "",
   });
+
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target;
     const alreadyIncluded = technologiesSelected.includes(value);
@@ -56,7 +58,6 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
       setImage(imageUrl);
     }
   };
-
   const handleChangeProyect = (event: ToDo) => {
     const { value, name } = event.target;
     setProyect((prevProyect: ToDo) => ({
@@ -64,6 +65,11 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
       [name]: value,
     }));
   };
+  const { /* data, isLoading,*/ errorMessage, makeRequest } = useFetch("", {
+    useInitialFetch: true,
+    method: "get",
+  });
+
   return (
     <Drawer isOpen={isOpen} placement="right" onClose={onClose} size={"md"}>
       <DrawerOverlay />
