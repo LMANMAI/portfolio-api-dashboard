@@ -17,6 +17,7 @@ import {
   Tag,
   useColorMode,
   Icon,
+  Box,
 } from "@chakra-ui/react";
 import { ToDo } from "../../interfaces";
 import { BsPlusSquareFill } from "react-icons/bs";
@@ -31,13 +32,17 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
   const [technologiesSelected, setTechnologiesSelected] = useState<string[]>(
     []
   );
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<File | null>(null);
   const [proyect, setProyect] = useState<ToDo>({
     name: "",
     productionUrl: "",
     repositoryUrl: "",
     proyectType: "",
     description: "",
+  });
+  const [urlErrors, setUrlErrors] = useState<{ [key: string]: string }>({
+    productionUrl: "",
+    repositoryUrl: "",
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -53,23 +58,74 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      console.log("Selected file:", file);
-      const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl);
+      setImage(file);
     }
   };
-  const handleChangeProyect = (event: ToDo) => {
+  const handleChangeProyect = (
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { value, name } = event.target;
+    if (name === "productionUrl" || name === "repositoryUrl") {
+      if (!isValidUrl(value)) {
+        setUrlErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: "URL no válida",
+        }));
+      } else {
+        setUrlErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: "",
+        }));
+      }
+    }
     setProyect((prevProyect: ToDo) => ({
       ...prevProyect,
       [name]: value,
     }));
   };
-  const { /* data, isLoading,*/ errorMessage, makeRequest } = useFetch("", {
-    useInitialFetch: true,
-    method: "get",
-  });
 
+  const isValidUrl = (url: string) => {
+    const urlPattern = new RegExp(
+      /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi
+    );
+    return !!urlPattern.test(url);
+  };
+
+  const { /* data, isLoading,*/ errorMessage, makeRequest } = useFetch(
+    "proyects/create",
+    {
+      useInitialFetch: false,
+      method: "post",
+    }
+  );
+
+  const handleSubmit = () => {
+    if (urlErrors.productionUrl || urlErrors.repositoryUrl) {
+      alert("Por favor, corrige las URLs inválidas antes de enviar.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("proyect", JSON.stringify(proyect));
+    if (image) {
+      formData.append("image", image);
+    }
+
+    makeRequest({
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  };
+
+  const isDisabled =
+    proyect.name === "" ||
+    proyect.productionUrl === "" ||
+    proyect.repositoryUrl === "" ||
+    proyect.proyectType === "";
   return (
     <Drawer isOpen={isOpen} placement="right" onClose={onClose} size={"md"}>
       <DrawerOverlay />
@@ -88,7 +144,9 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
               h={"150px"}
               marginBottom={"5px"}
               title="Agregar imagen de portada al proyecto"
-              backgroundImage={image ? `url(${image})` : ""}
+              backgroundImage={
+                image ? `url(${URL.createObjectURL(image)})` : ""
+              }
               backgroundColor={
                 !image
                   ? `${colorMode === "light" ? "bgLigthtMode" : "bgDarkMode"}`
@@ -146,7 +204,7 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
             </Stack>
             <div style={{ display: "flex", gap: "10px", margin: "2.5px 0px" }}>
               <div style={{ width: "100%" }}>
-                <FormLabel>Nombre del proyecto</FormLabel>
+                <FormLabel>* Nombre del proyecto</FormLabel>
                 <Input
                   name="name"
                   value={proyect.name}
@@ -155,28 +213,34 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
                 />
               </div>
               <div style={{ width: "100%" }}>
-                <FormLabel>Url del proyecto</FormLabel>
+                <FormLabel>* Url del proyecto</FormLabel>
                 <Input
                   name="productionUrl"
                   value={proyect.productionUrl}
                   onChange={(e) => handleChangeProyect(e)}
                   placeholder="https://url.vercel.com"
                 />
+                {urlErrors.productionUrl && (
+                  <p style={{ color: "red" }}>{urlErrors.productionUrl}</p>
+                )}
               </div>
             </div>
             <div style={{ display: "flex", gap: "10px", margin: "5px 0px" }}>
               <div style={{ width: "100%" }}>
-                <FormLabel>Url del repositorio</FormLabel>
+                <FormLabel>* Url del repositorio</FormLabel>
                 <Input
                   name="repositoryUrl"
                   value={proyect.repositoryUrl}
                   onChange={(e) => handleChangeProyect(e)}
                   placeholder="https://github.com/LMANMAI"
                 />
+                {urlErrors.repositoryUrl && (
+                  <p style={{ color: "red" }}>{urlErrors.repositoryUrl}</p>
+                )}
               </div>
 
               <div style={{ width: "100%" }}>
-                <FormLabel>Tipo de proyecto</FormLabel>
+                <FormLabel>* Tipo de proyecto</FormLabel>
                 <Select
                   size="md"
                   w={"100%"}
@@ -184,15 +248,14 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
                   onChange={(e) => handleChangeProyect(e)}
                   placeholder="Seleccion un tipo"
                 >
-                  <option value="option1">Option 1</option>
-                  <option value="option2">Option 2</option>
-                  <option value="option3">Option 3</option>
+                  <option value="option2">Frontend</option>
+                  <option value="option3">Backend</option>
                 </Select>
               </div>
             </div>
             <div style={{ display: "flex", gap: "10px", margin: "5px 0px" }}>
               <div style={{ width: "100%" }}>
-                <FormLabel>Tecnologias</FormLabel>
+                <FormLabel>* Tecnologias</FormLabel>
                 <div
                   style={{ display: "flex", gap: "10px", margin: "10px 0px" }}
                 >
@@ -207,9 +270,13 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
                   placeholder="Seleccionar tecnologias"
                   onChange={handleChange}
                 >
-                  <option value="option1">Option 1</option>
-                  <option value="option2">Option 2</option>
-                  <option value="option3">Option 3</option>
+                  {/*Esto deberia cargarse con un endpoint, el mismo que traiiga las skiills y herramientas*/}
+                  <option value="option1">Rect.js</option>
+                  <option value="option2">Node.js</option>
+                  <option value="option3">Mongo DB</option>
+                  <option value="option1">Rect.js</option>
+                  <option value="option2">Node.js</option>
+                  <option value="option3">Mongo DB</option>
                 </Select>
               </div>
             </div>
@@ -234,22 +301,35 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
               onClose();
               setTechnologiesSelected([]);
             }}
+            height={"30px"}
+            borderRadius={"5px"}
             borderColor={colorMode === "light" ? "primary" : "secondary"}
             borderWidth={"3px"}
           >
             Cancelar
           </Button>
-          <Button
-            variant={"primary"}
+          <Box
+            as="button"
+            //variant={"primary"}
             color={"white"}
             bg={colorMode === "light" ? "primary" : "secondary"}
+            disabled={isDisabled}
+            padding={"0px 16px"}
+            height={"30px"}
+            borderRadius={"5px"}
             onClick={() => {
               //setTechnologiesSelected([]);
+              handleSubmit();
               console.log(proyect, "proyect");
+            }}
+            _disabled={{
+              cursor: "not-allowed",
+              backgroundColor: "#F5F6F7",
+              color: "#4B4F56",
             }}
           >
             Guardar
-          </Button>
+          </Box>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

@@ -39,7 +39,7 @@ export default function useFetch<T>(
   const makeRequest = useCallback(
     async (requestOptions?: Omit<useFetchOptions, "useInitialFetch">) => {
       setIsLoading(true);
-      const { method, successMessage } = options;
+      const { method } = options;
       let response;
 
       // Mapeo de métodos permitidos a los métodos de Axios
@@ -60,6 +60,7 @@ export default function useFetch<T>(
           data: requestOptions?.data || options?.data,
           headers: {
             id_channel: "sucursal",
+            "api-key": import.meta.env.VITE_API_KEY_BE as string,
             ...options.headers,
             ...requestOptions?.headers,
           },

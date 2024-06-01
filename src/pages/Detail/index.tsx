@@ -28,7 +28,7 @@ const DetailPage = () => {
 
     setTimeout(() => {
       //esto tiene que pasar a un ep cuando este listo
-      const filteredItem = mockData.filter((item: ToDo) => item.id === id);
+      const filteredItem = mockData.filter((item: ToDo) => item.name === id);
       setActiveItem(filteredItem[0]);
       setLoad(false);
     }, 20);
