@@ -19,10 +19,10 @@ import {
   Button,
   useToast,
 } from "@chakra-ui/react";
-import { LoadingComponent } from "../../components";
+import { LoadingComponent, DrawerComponent } from "../../components";
 import { useEffect, useState } from "react";
 import { ToDo } from "../../interfaces";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import useFetch from "../../hooks/useFetch";
 const DetailPage = () => {
@@ -32,6 +32,7 @@ const DetailPage = () => {
   const { colorMode } = useColorMode();
   const [activeItem, setActiveItem] = useState<ToDo>({});
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openDrawerEdit, setOpenDrawerEdit] = useState<boolean>(false);
   const buttonReset = {
     borderColor: colorMode !== "light" ? "secondary" : "primary",
     borderWidth: "2px",
@@ -39,6 +40,7 @@ const DetailPage = () => {
     color: colorMode !== "light" ? "secondary" : "primary",
   };
 
+  //me traigo los detalles del poryecto
   const { data, isLoading, makeRequest, setIsLoading } = useFetch<ToDo>(
     `proyects/${id}`,
     {
@@ -59,6 +61,7 @@ const DetailPage = () => {
     }
   }, [data]);
 
+  //elimino el proyecto
   const {
     data: proyectDeleted,
     isLoading: deletedLoad,
@@ -136,7 +139,13 @@ const DetailPage = () => {
                 _hover={buttonReset}
               />
               <MenuList color={colorMode === "light" ? "#2c2c2c" : "white"}>
-                <MenuItem>Editar proyecto</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setOpenDrawerEdit(true);
+                  }}
+                >
+                  Editar proyecto
+                </MenuItem>
                 <MenuItem>Agregar seccion adicional</MenuItem>
                 <MenuItem
                   onClick={() => {
@@ -245,6 +254,21 @@ const DetailPage = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <DrawerComponent
+        isOpen={openDrawerEdit}
+        onClose={() => {
+          setOpenDrawerEdit(false);
+        }}
+        isEditing={true}
+        initialProyect={{
+          name: activeItem.name,
+          productionUrl: activeItem.productionUrl,
+          repositoryUrl: activeItem.repositoryUrl,
+          proyectType: activeItem.proyectType,
+          description: activeItem.description,
+          technologies: activeItem.technologyStack,
+        }}
+      />
     </Box>
   );
 };

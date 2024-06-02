@@ -24,30 +24,42 @@ import { ToDo } from "../../interfaces";
 import { BsPlusSquareFill } from "react-icons/bs";
 import useFetch from "../../hooks/useFetch";
 import LoadingComponent from "../Loading";
-const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
-  isOpen,
-  onClose,
-}) => {
+import { useParams } from "react-router-dom";
+const DrawerComponent: React.FC<{
+  onClose: () => void;
+  isOpen: boolean;
+  initialProyect?: ToDo;
+  isEditing?: boolean;
+}> = ({ isOpen, onClose, initialProyect, isEditing }) => {
   const toast = useToast();
+  const { id } = useParams<{ id: ToDo }>();
   const { colorMode } = useColorMode();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [technologiesSelected, setTechnologiesSelected] = useState<string[]>(
-    []
+    initialProyect?.technologies || []
   );
   const [image, setImage] = useState<File | null>(null);
-  const [proyect, setProyect] = useState<ToDo>({
-    name: "",
-    productionUrl: "",
-    repositoryUrl: "",
-    proyectType: "",
-    description: "",
-  });
+  const [proyect, setProyect] = useState<ToDo>(
+    initialProyect || {
+      name: "",
+      productionUrl: "",
+      repositoryUrl: "",
+      proyectType: "",
+      description: "",
+      technologies: [],
+    }
+  );
   const [urlErrors, setUrlErrors] = useState<{ [key: string]: string }>({
     productionUrl: "",
     repositoryUrl: "",
   });
-
+  useEffect(() => {
+    if (initialProyect) {
+      setProyect(initialProyect);
+      setTechnologiesSelected(initialProyect.technologies || []);
+    }
+  }, [initialProyect]);
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target;
     const alreadyIncluded = technologiesSelected.includes(value);
@@ -108,10 +120,11 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
     });
   };
   const { data, isLoading, errorMessage, makeRequest, setIsLoading } =
-    useFetch<ToDo>("proyects/create", {
+    useFetch<ToDo>(isEditing ? `editproyect/${id}` : "proyects/create", {
       useInitialFetch: false,
-      method: "post",
+      method: isEditing ? "put" : "post",
     });
+
   useEffect(() => {
     console.log(data, "data");
     if (!data && errorMessage.status === 400) {
@@ -165,13 +178,15 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>Agregar proyecto</DrawerHeader>
+        <DrawerHeader>
+          {isEditing ? "Editar proyecto" : "Agregar proyecto"}
+        </DrawerHeader>
 
         <DrawerBody>
           {isLoading ? (
             <LoadingComponent
               loading={isLoading}
-              label={"Guardando proyecto"}
+              label={isEditing ? "Actualizando proyecto" : "Guardando proyecto"}
             />
           ) : (
             <FormControl>
@@ -373,7 +388,7 @@ const DrawerComponent: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
               color: "#4B4F56",
             }}
           >
-            Guardar
+            {isEditing ? "Actualizar" : "Guardar"}
           </Box>
         </DrawerFooter>
       </DrawerContent>
