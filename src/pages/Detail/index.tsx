@@ -9,42 +9,93 @@ import {
   MenuList,
   MenuItem,
   IconButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
+  useToast,
 } from "@chakra-ui/react";
 import { LoadingComponent } from "../../components";
 import { useEffect, useState } from "react";
-import { mockData } from "../../containers/MyProyects/static";
 import { ToDo } from "../../interfaces";
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { HamburgerIcon } from "@chakra-ui/icons";
+import useFetch from "../../hooks/useFetch";
 const DetailPage = () => {
+  const toast = useToast();
+  const navigate = useNavigate();
   const { id } = useParams<{ id: ToDo }>();
   const { colorMode } = useColorMode();
-
-  const [load, setLoad] = useState<boolean>(false);
   const [activeItem, setActiveItem] = useState<ToDo>({});
-
-  const getDetailsFromProyect = (id: number) => {
-    setLoad(true);
-
-    setTimeout(() => {
-      //esto tiene que pasar a un ep cuando este listo
-      const filteredItem = mockData.filter((item: ToDo) => item.name === id);
-      setActiveItem(filteredItem[0]);
-      setLoad(false);
-    }, 20);
-  };
-
-  useEffect(() => {
-    getDetailsFromProyect(Number(id));
-  }, []);
-
+  const [openModal, setOpenModal] = useState<boolean>(false);
   const buttonReset = {
     borderColor: colorMode !== "light" ? "secondary" : "primary",
     borderWidth: "2px",
     background: "transparent",
     color: colorMode !== "light" ? "secondary" : "primary",
   };
-  console.log(activeItem);
+
+  const { data, isLoading, makeRequest, setIsLoading } = useFetch<ToDo>(
+    `proyects/${id}`,
+    {
+      useInitialFetch: false,
+      method: "get",
+    }
+  );
+
+  useEffect(() => {
+    setIsLoading(true);
+    makeRequest();
+  }, []);
+
+  useEffect(() => {
+    if (data && data.status === 200) {
+      setIsLoading(false);
+      setActiveItem(data.proyect);
+    }
+  }, [data]);
+
+  const {
+    data: proyectDeleted,
+    isLoading: deletedLoad,
+    makeRequest: setDeleteProyect,
+    errorMessage,
+    setIsLoading: setDeletedLoad,
+  } = useFetch<ToDo>(`proyects/${id}`, {
+    useInitialFetch: false,
+    method: "delete",
+  });
+  const handleDeleteProyect = () => {
+    setOpenModal(false);
+    setDeleteProyect();
+  };
+  useEffect(() => {
+    if (proyectDeleted && proyectDeleted.status === 200) {
+      setDeletedLoad(false);
+      toast({
+        title: `Proyecto eliminado correctamennte`,
+        description: `El proyecto ${proyectDeleted.data.name} fue eliminado correctamente.`,
+        status: "success",
+        isClosable: true,
+        position: "bottom-right",
+      });
+      navigate("/");
+    } else if (errorMessage && errorMessage.status === 400) {
+      setDeletedLoad(false);
+      toast({
+        title: `${errorMessage.msg} #${errorMessage.status}`,
+        description: "Revisa los datos y volve a enviar el proyecto",
+        status: "error",
+        isClosable: true,
+        position: "bottom-right",
+      });
+    }
+  }, [proyectDeleted, errorMessage]);
+
   return (
     <Box
       padding="0px"
@@ -57,9 +108,9 @@ const DetailPage = () => {
       borderRadius={"5px"}
       //  overflowY="auto"
     >
-      {load ? (
+      {isLoading ? (
         <LoadingComponent
-          loading={load}
+          loading={isLoading}
           label="Obteniendo detalles del proyecto"
         />
       ) : (
@@ -87,7 +138,13 @@ const DetailPage = () => {
               <MenuList color={colorMode === "light" ? "#2c2c2c" : "white"}>
                 <MenuItem>Editar proyecto</MenuItem>
                 <MenuItem>Agregar seccion adicional</MenuItem>
-                <MenuItem>Eliminar Proyecto</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setOpenModal(true);
+                  }}
+                >
+                  Eliminar Proyecto
+                </MenuItem>
               </MenuList>
             </Menu>
           </Stack>
@@ -129,7 +186,7 @@ const DetailPage = () => {
                 h={"170px"}
                 title="Imagen del proyecto"
               ></Stack>
-              <Text>{activeItem.description}</Text>
+              <Text>{activeItem.desc}</Text>
             </Stack>
             {activeItem.aditionalData &&
               activeItem.aditionalData.map((item: ToDo) => (
@@ -146,6 +203,48 @@ const DetailPage = () => {
           </Stack>
         </Stack>
       )}
+
+      <Modal
+        closeOnOverlayClick={false}
+        isOpen={openModal}
+        isCentered
+        onClose={() => setOpenModal(false)}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Eliminar proyecto</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {deletedLoad ? (
+              <LoadingComponent
+                loading={deletedLoad}
+                label="Eliminando el proyecto"
+              />
+            ) : (
+              <Text>
+                ¿Está seguro que desea eliminar el proyecto "
+                <strong>{activeItem.name}</strong>"? Este será eliminado y no se
+                podrá recuperar.
+              </Text>
+            )}
+          </ModalBody>
+
+          <ModalFooter>
+            <Button variant="secondary" onClick={() => setOpenModal(false)}>
+              Cancelar
+            </Button>
+            <Button
+              color={"white"}
+              transition="all 0.2s"
+              bg={colorMode === "light" ? "primary" : "secondary"}
+              _active={buttonReset}
+              onClick={() => handleDeleteProyect()}
+            >
+              Eliminar
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };

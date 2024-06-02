@@ -14,6 +14,7 @@ import useFetch from "../../hooks/useFetch";
 import { useEffect, useState } from "react";
 const MyProyects = () => {
   const [proyectsData, setProyectsData] = useState<ToDo[]>([]);
+
   const { colorMode } = useColorMode();
   const { data: proyectsFetch, makeRequest: getProyects } = useFetch<any>(
     "proyects",
@@ -59,7 +60,7 @@ const MyProyects = () => {
             <Text fontSize={"13px"}>{item.description}</Text>
           </CardBody>
           <CardFooter padding={"10px"} justifyContent={"end"}>
-            <Link to={`/${item.name}`}>Ver detalle</Link>
+            <Link to={`/${item._id}`}>Ver detalle</Link>
           </CardFooter>
         </Card>
       ))}

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import axios, { AxiosError, Method } from "axios";
+import { ToDo } from "../interfaces";
 
 type AllowedMethods = "get" | "post" | "put" | "delete";
 interface useFetchOptions {
@@ -25,7 +26,10 @@ export default function useFetch<T>(
   const [isLoading, setIsLoading] = useState<boolean>(
     options.useInitialFetch ?? false
   );
-  const [errorMessage, setErrorMessage] = useState<AxiosError>();
+  const [errorMessage, setErrorMessage] = useState<ToDo>({
+    msg: "",
+    status: 0,
+  });
 
   const cancelToken = useRef(false);
 
@@ -69,23 +73,14 @@ export default function useFetch<T>(
         setData(response.data);
         setIsLoading(false);
       } catch (err) {
-        const error = err as AxiosError;
         const errorResponse = err as ErrorType;
-        if (
-          errorResponse.response.data?.errors[0] &&
-          errorResponse.response.data.errors[0].message !==
-            "Una de las tarifas que intenta modificar ya posee un cambio realizado."
-        ) {
-          setData(undefined);
-          setErrorMessage(error);
+        setErrorMessage({
+          msg: errorResponse.response.data?.message,
+          status: errorResponse.response.status,
+        });
+        setTimeout(() => {
           setIsLoading(false);
-          if (
-            errorResponse.response?.data.errors &&
-            errorResponse.response?.data.errors[0]
-          ) {
-            // Handle specific errors here if needed
-          }
-        }
+        }, 1000);
       }
     },
     [options, url]
@@ -100,5 +95,5 @@ export default function useFetch<T>(
     };
   }, [makeRequest, options.useInitialFetch]);
 
-  return { data, isLoading, errorMessage, makeRequest };
+  return { data, isLoading, errorMessage, makeRequest, setIsLoading };
 }
