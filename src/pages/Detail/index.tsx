@@ -18,20 +18,30 @@ import {
   ModalCloseButton,
   Button,
   useToast,
+  Icon,
+  FormLabel,
+  Textarea,
 } from "@chakra-ui/react";
 import { LoadingComponent, DrawerComponent } from "../../components";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ToDo } from "../../interfaces";
 import { useNavigate, useParams } from "react-router-dom";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import useFetch from "../../hooks/useFetch";
+import { BsPlusSquareFill } from "react-icons/bs";
 const DetailPage = () => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
   const toast = useToast();
   const navigate = useNavigate();
   const { id } = useParams<{ id: ToDo }>();
   const { colorMode } = useColorMode();
   const [activeItem, setActiveItem] = useState<ToDo>({});
+  const [image, setImage] = useState<File | null>(null);
+  const [aditionalDescription, setAditionalDescription] = useState<string>("");
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openModalAditionalDesct, setOpenModalAditionalDesct] =
+    useState<boolean>(false);
   const [openDrawerEdit, setOpenDrawerEdit] = useState<boolean>(false);
   const buttonReset = {
     borderColor: colorMode !== "light" ? "secondary" : "primary",
@@ -39,7 +49,7 @@ const DetailPage = () => {
     background: "transparent",
     color: colorMode !== "light" ? "secondary" : "primary",
   };
-
+  const isDisabled = image == null || aditionalDescription == "";
   //me traigo los detalles del poryecto
   const { data, isLoading, makeRequest, setIsLoading } = useFetch<ToDo>(
     `proyects/${id}`,
@@ -99,6 +109,63 @@ const DetailPage = () => {
     }
   }, [proyectDeleted, errorMessage]);
 
+  //Adicion de la descripcion extra
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
+  const {
+    data: editedProyect,
+    isLoading: editedProyectLoad,
+    makeRequest: setEditedProyect,
+    errorMessage: errorEditedProyect,
+    setIsLoading: setEditedProyectLoad,
+  } = useFetch<ToDo>(`proyects/aditionalData/${id}`, {
+    useInitialFetch: false,
+    method: "put",
+  });
+
+  const handleAditionalData = async () => {
+    setEditedProyectLoad(true);
+    const formData = new FormData();
+    formData.append("description", JSON.stringify(aditionalDescription));
+    if (image) {
+      formData.append("image", image);
+    }
+    setEditedProyect({
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  };
+  useEffect(() => {
+    if (editedProyect && editedProyect.status === 200) {
+      setDeletedLoad(false);
+      makeRequest();
+      toast({
+        title: `Descripcion agregada correctamente`,
+        description: `El proyecto ${editedProyect.data.name} fue actualizado correctamente.`,
+        status: "success",
+        isClosable: true,
+        position: "bottom-right",
+      });
+      setImage(null);
+      setAditionalDescription("");
+    } else if (errorEditedProyect && errorEditedProyect.status === 400) {
+      setDeletedLoad(false);
+      toast({
+        title: `${errorEditedProyect.msg} error#${errorEditedProyect.status}`,
+        status: "error",
+        isClosable: true,
+        position: "bottom-right",
+      });
+    }
+  }, [editedProyect, errorEditedProyect]);
+
   return (
     <Box
       padding="0px"
@@ -146,7 +213,13 @@ const DetailPage = () => {
                 >
                   Editar proyecto
                 </MenuItem>
-                <MenuItem>Agregar seccion adicional</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setOpenModalAditionalDesct(true);
+                  }}
+                >
+                  Agregar seccion adicional
+                </MenuItem>
                 <MenuItem
                   onClick={() => {
                     setOpenModal(true);
@@ -254,10 +327,143 @@ const DetailPage = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <Modal
+        closeOnOverlayClick={false}
+        isOpen={openModalAditionalDesct}
+        isCentered
+        onClose={() => setOpenModalAditionalDesct(false)}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Agreagar description adicional</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {deletedLoad ? (
+              <LoadingComponent
+                loading={deletedLoad}
+                label="Eliminando el proyecto"
+              />
+            ) : (
+              <Stack>
+                {/*Boton para agregar imagen*/}
+                <Stack
+                  flexDirection={"row"}
+                  justifyContent={"end"}
+                  alignItems={"end"}
+                  width={"100%"}
+                  h={"150px"}
+                  marginBottom={"5px"}
+                  title="Agregar imagen de portada al proyecto"
+                  backgroundImage={
+                    image ? `url(${URL.createObjectURL(image)})` : ""
+                  }
+                  backgroundColor={
+                    !image
+                      ? `${
+                          colorMode === "light" ? "bgLigthtMode" : "bgDarkMode"
+                        }`
+                      : ""
+                  }
+                  backgroundSize="cover"
+                  backgroundPosition="center"
+                  borderRadius={"5px"}
+                  _hover={!image ? {} : { opacity: 0.75 }}
+                  position={"relative"}
+                >
+                  <Button
+                    variant={"primary"}
+                    color={"white"}
+                    width={"100%"}
+                    h={"100%"}
+                    _hover={{ opacity: 0.5 }}
+                    flexDirection={"column"}
+                  >
+                    <Icon fontSize={30} as={BsPlusSquareFill} />
+                    <FormLabel fontSize={"13px"} m={2}>
+                      {!image
+                        ? "Agregar portada del proyecto"
+                        : "Cambiar imagen del proyecto"}
+                    </FormLabel>
+                    <input
+                      type="file"
+                      ref={inputRef}
+                      style={{
+                        position: "absolute",
+                        width: "100%",
+                        height: "100%",
+                        opacity: 0,
+                        cursor: "pointer",
+                      }}
+                      accept="*.jpeg"
+                      onChange={handleFileChange}
+                    />
+                  </Button>
+                  <Button
+                    onClick={() => setImage(null)}
+                    h="10px"
+                    width="10px"
+                    fontSize={"10px"}
+                    position={"absolute"}
+                    right={"5px"}
+                    bottom={"5px"}
+                    className="delete_button"
+                    visibility={image ? "visible" : "hidden"}
+                    zIndex={2}
+                    title="Eliminar imagen"
+                  >
+                    X
+                  </Button>
+                </Stack>
+                <div style={{ margin: "10px 0px" }}>
+                  <FormLabel>Descripcion del proyecto</FormLabel>
+                  <Textarea
+                    resize={"none"}
+                    name="description"
+                    value={aditionalDescription}
+                    onChange={(e) => setAditionalDescription(e.target.value)}
+                    placeholder="Descripción de lo desarrollado."
+                  />
+                </div>
+              </Stack>
+            )}
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setOpenModalAditionalDesct(false)}
+            >
+              Cerrar
+            </Button>
+            <Box
+              as="button"
+              color={"white"}
+              bg={colorMode === "light" ? "primary" : "secondary"}
+              disabled={isDisabled}
+              padding={"0px 16px"}
+              height={"30px"}
+              borderRadius={"5px"}
+              _active={buttonReset}
+              onClick={() => {
+                handleAditionalData();
+              }}
+              _disabled={{
+                cursor: "not-allowed",
+                backgroundColor: "#F5F6F7",
+                color: "#4B4F56",
+              }}
+            >
+              Agregar
+            </Box>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <DrawerComponent
         isOpen={openDrawerEdit}
         onClose={() => {
           setOpenDrawerEdit(false);
+          makeRequest();
         }}
         isEditing={true}
         initialProyect={{

@@ -120,14 +120,16 @@ const DrawerComponent: React.FC<{
     });
   };
   const { data, isLoading, errorMessage, makeRequest, setIsLoading } =
-    useFetch<ToDo>(isEditing ? `editproyect/${id}` : "proyects/create", {
-      useInitialFetch: false,
-      method: isEditing ? "put" : "post",
-    });
+    useFetch<ToDo>(
+      isEditing ? `proyects/editproyect/${id}` : "proyects/create",
+      {
+        useInitialFetch: false,
+        method: isEditing ? "put" : "post",
+      }
+    );
 
   useEffect(() => {
-    console.log(data, "data");
-    if (!data && errorMessage.status === 400) {
+    if ((!data && errorMessage.status === 400) || errorMessage.status === 404) {
       toast({
         title: `${errorMessage.msg}`,
         description: "Revisa los datos y volve a enviar el proyecto",
@@ -154,17 +156,27 @@ const DrawerComponent: React.FC<{
     }
 
     const formData = new FormData();
+    proyect.technologyStack = technologiesSelected;
     formData.append("proyect", JSON.stringify(proyect));
     if (image) {
       formData.append("image", image);
     }
-
-    makeRequest({
-      data: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    if (isEditing) {
+      makeRequest({
+        data: proyect,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } else {
+      makeRequest({
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    }
+    onClose();
   };
 
   const isDisabled =
@@ -305,8 +317,8 @@ const DrawerComponent: React.FC<{
                     onChange={(e) => handleChangeProyect(e)}
                     placeholder="Seleccion un tipo"
                   >
-                    <option value="option2">Frontend</option>
-                    <option value="option3">Backend</option>
+                    <option value="Front_end">Frontend</option>
+                    <option value="Back_end">Backend</option>
                   </Select>
                 </div>
               </div>
@@ -370,7 +382,6 @@ const DrawerComponent: React.FC<{
           </Button>
           <Box
             as="button"
-            //variant={"primary"}
             color={"white"}
             bg={colorMode === "light" ? "primary" : "secondary"}
             disabled={isDisabled}
@@ -378,9 +389,7 @@ const DrawerComponent: React.FC<{
             height={"30px"}
             borderRadius={"5px"}
             onClick={() => {
-              //setTechnologiesSelected([]);
               handleSubmit();
-              console.log(proyect, "proyect");
             }}
             _disabled={{
               cursor: "not-allowed",
