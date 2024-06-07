@@ -26,7 +26,7 @@ import { LoadingComponent, DrawerComponent } from "../../components";
 import { useEffect, useRef, useState } from "react";
 import { ToDo } from "../../interfaces";
 import { useNavigate, useParams } from "react-router-dom";
-import { HamburgerIcon } from "@chakra-ui/icons";
+import { HamburgerIcon, SettingsIcon } from "@chakra-ui/icons";
 import useFetch from "../../hooks/useFetch";
 import { BsPlusSquareFill } from "react-icons/bs";
 const DetailPage = () => {
@@ -43,6 +43,11 @@ const DetailPage = () => {
   const [openModalAditionalDesct, setOpenModalAditionalDesct] =
     useState<boolean>(false);
   const [openDrawerEdit, setOpenDrawerEdit] = useState<boolean>(false);
+
+  const [isEditingAditional, setIsEditingAditional] = useState<boolean>(false);
+  const [aditionalId, setAditionalId] = useState<string | null>(null);
+  const [aditionalIMG, setAditionalIMG] = useState<string | null>(null);
+
   const buttonReset = {
     borderColor: colorMode !== "light" ? "secondary" : "primary",
     borderWidth: "2px",
@@ -128,6 +133,29 @@ const DetailPage = () => {
     method: "put",
   });
 
+  //editar entrada
+  const {
+    data: editedEntry,
+    isLoading: editedEntryLoad,
+    makeRequest: setEditedEntry,
+    errorMessage: errorEditedEntry,
+    setIsLoading: setEditedEntryLoad,
+  } = useFetch<ToDo>(`proyects/edit/${id}/${aditionalId}`, {
+    useInitialFetch: false,
+    method: "put",
+  });
+  //eliminar entrada
+  const {
+    data: deletedEntry,
+    isLoading: deletedEntryLoad,
+    makeRequest: setDeletedEntry,
+    errorMessage: errorDeletedEntry,
+    setIsLoading: setDeletedEntryLoad,
+  } = useFetch<ToDo>(`proyects/deleteentry/${id}/${aditionalId}`, {
+    useInitialFetch: false,
+    method: "put",
+  });
+
   const handleAditionalData = async () => {
     setEditedProyectLoad(true);
     const formData = new FormData();
@@ -142,6 +170,7 @@ const DetailPage = () => {
       },
     });
   };
+
   useEffect(() => {
     if (editedProyect && editedProyect.status === 200) {
       setDeletedLoad(false);
@@ -155,7 +184,11 @@ const DetailPage = () => {
       });
       setImage(null);
       setAditionalDescription("");
-    } else if (errorEditedProyect && errorEditedProyect.status === 400) {
+    }
+  }, [editedProyect]);
+
+  useEffect(() => {
+    if (errorEditedProyect && errorEditedProyect.status === 400) {
       setDeletedLoad(false);
       toast({
         title: `${errorEditedProyect.msg} error#${errorEditedProyect.status}`,
@@ -164,7 +197,83 @@ const DetailPage = () => {
         position: "bottom-right",
       });
     }
-  }, [editedProyect, errorEditedProyect]);
+  }, [errorEditedProyect]);
+
+  useEffect(() => {
+    if (editedEntry && editedEntry.status === 200) {
+      setDeletedLoad(false);
+      makeRequest();
+      toast({
+        title: `Entrada editada correctamente`,
+        description: `La entrada fue actualizada correctamente.`,
+        status: "success",
+        isClosable: true,
+        position: "bottom-right",
+      });
+    }
+  }, [editedEntry]);
+
+  useEffect(() => {
+    if (deletedEntry && deletedEntry.status === 200) {
+      setDeletedLoad(false);
+      makeRequest();
+      toast({
+        title: `Entrada eliminada correctamente`,
+        description: `La entrada fue eliminada correctamente.`,
+        status: "success",
+        isClosable: true,
+        position: "bottom-right",
+      });
+      setOpenModalAditionalDesct(false);
+      setIsEditingAditional(false);
+      setAditionalId(null);
+      setAditionalDescription("");
+      setImage(null);
+    }
+  }, [deletedEntry]);
+
+  const openAditionalModal = (id?: string) => {
+    if (id) {
+      setIsEditingAditional(true);
+      setAditionalId(id);
+      const aditionalData = activeItem.aditionalData.find(
+        (item: ToDo) => item._id === id
+      );
+      if (aditionalData) {
+        setAditionalDescription(aditionalData.text);
+        setAditionalIMG(aditionalData.img);
+        setImage(null);
+      }
+    } else {
+      setIsEditingAditional(false);
+      setAditionalId(null);
+      setAditionalDescription("");
+      setImage(null);
+    }
+    setOpenModalAditionalDesct(true);
+  };
+  const handleEditAditionalData = async () => {
+    const formData = new FormData();
+    console.log(aditionalDescription);
+    formData.append("text", JSON.stringify(aditionalDescription));
+
+    console.log(aditionalIMG, "aditionalIMG");
+    if (image) {
+      formData.append("image", image);
+    } else formData.append("image", JSON.stringify(aditionalIMG));
+
+    setEditedEntry({
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  };
+
+  const handleDeleteAditionalData = async () => {
+    setDeletedEntryLoad(true);
+    setDeletedEntry();
+  };
 
   return (
     <Box
@@ -176,7 +285,6 @@ const DetailPage = () => {
       bg={"#e5e7eb"}
       border={"1px solid #d8d8d8"}
       borderRadius={"5px"}
-      //  overflowY="auto"
     >
       {isLoading ? (
         <LoadingComponent
@@ -197,7 +305,7 @@ const DetailPage = () => {
               <MenuButton
                 as={IconButton}
                 aria-label="Options"
-                icon={<HamburgerIcon />}
+                icon={<SettingsIcon />}
                 variant="outline"
                 color={"white"}
                 transition="all 0.2s"
@@ -265,10 +373,16 @@ const DetailPage = () => {
               <Stack
                 bg={"gray"}
                 w={"100%"}
-                h={"170px"}
+                h={"270px"}
                 title="Imagen del proyecto"
+                backgroundImage={`${import.meta.env.VITE_URL_EP_CLOUD}${
+                  activeItem.posterPath
+                }`}
+                backgroundPosition="center"
+                backgroundSize="cover"
+                backgroundRepeat="no-repeat"
               ></Stack>
-              <Text>{activeItem.desc}</Text>
+              <Text>{activeItem.description}</Text>
             </Stack>
             {activeItem.aditionalData &&
               activeItem.aditionalData.map((item: ToDo) => (
@@ -277,7 +391,15 @@ const DetailPage = () => {
                     bg={"gray"}
                     w={"100%"}
                     h={"170px"}
-                    title={item.img}
+                    onClick={() => openAditionalModal(item._id)}
+                    backgroundImage={`${import.meta.env.VITE_URL_EP_CLOUD}${
+                      item.img
+                    }`}
+                    backgroundPosition="center"
+                    backgroundSize="cover"
+                    backgroundRepeat="no-repeat"
+                    cursor={"pointer"}
+                    title="click para editar"
                   ></Stack>
                   <Text>{item.text}</Text>
                 </Stack>
@@ -332,11 +454,12 @@ const DetailPage = () => {
         closeOnOverlayClick={false}
         isOpen={openModalAditionalDesct}
         isCentered
+        size={"xl"}
         onClose={() => setOpenModalAditionalDesct(false)}
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Agreagar description adicional</ModalHeader>
+          <ModalHeader>Agregar descripcion adicional</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {deletedLoad ? (
@@ -356,7 +479,9 @@ const DetailPage = () => {
                   marginBottom={"5px"}
                   title="Agregar imagen de portada al proyecto"
                   backgroundImage={
-                    image ? `url(${URL.createObjectURL(image)})` : ""
+                    isEditingAditional && !image
+                      ? `${import.meta.env.VITE_URL_EP_CLOUD}${aditionalIMG}`
+                      : `url(${image !== null && URL.createObjectURL(image)})`
                   }
                   backgroundColor={
                     !image
@@ -381,7 +506,7 @@ const DetailPage = () => {
                   >
                     <Icon fontSize={30} as={BsPlusSquareFill} />
                     <FormLabel fontSize={"13px"} m={2}>
-                      {!image
+                      {!aditionalIMG
                         ? "Agregar portada del proyecto"
                         : "Cambiar imagen del proyecto"}
                     </FormLabel>
@@ -440,13 +565,15 @@ const DetailPage = () => {
               as="button"
               color={"white"}
               bg={colorMode === "light" ? "primary" : "secondary"}
-              disabled={isDisabled}
+              //disabled={isDisabled}
               padding={"0px 16px"}
               height={"30px"}
               borderRadius={"5px"}
               _active={buttonReset}
               onClick={() => {
-                handleAditionalData();
+                isEditingAditional
+                  ? handleEditAditionalData()
+                  : handleAditionalData();
               }}
               _disabled={{
                 cursor: "not-allowed",
@@ -454,8 +581,17 @@ const DetailPage = () => {
                 color: "#4B4F56",
               }}
             >
-              Agregar
+              {isEditingAditional ? "Editar" : "Agregar"}
             </Box>
+            {isEditingAditional && (
+              <Button
+                color={"red.500"}
+                marginLeft={"10px"}
+                onClick={() => handleDeleteAditionalData()}
+              >
+                Eliminar
+              </Button>
+            )}
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -473,6 +609,8 @@ const DetailPage = () => {
           proyectType: activeItem.proyectType,
           description: activeItem.description,
           technologies: activeItem.technologyStack,
+          aditionalData: activeItem.aditionalData,
+          posterPath: activeItem.posterPath,
         }}
       />
     </Box>

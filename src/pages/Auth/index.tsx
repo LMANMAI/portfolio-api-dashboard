@@ -15,7 +15,6 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { signInUser } from "../../config/firebase-config";
 import { useNavigate } from "react-router-dom";
-import { BsFillSunFill, BsMoonFill } from "react-icons/bs";
 
 const AuthPage = () => {
   const toast = useToast();

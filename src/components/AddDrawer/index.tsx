@@ -212,7 +212,13 @@ const DrawerComponent: React.FC<{
                 marginBottom={"5px"}
                 title="Agregar imagen de portada al proyecto"
                 backgroundImage={
-                  image ? `url(${URL.createObjectURL(image)})` : ""
+                  image
+                    ? `url(${URL.createObjectURL(image)})`
+                    : isEditing
+                    ? `${import.meta.env.VITE_URL_EP_CLOUD}${
+                        initialProyect.posterPath
+                      }`
+                    : ""
                 }
                 backgroundColor={
                   !image
@@ -235,7 +241,7 @@ const DrawerComponent: React.FC<{
                 >
                   <Icon fontSize={30} as={BsPlusSquareFill} />
                   <FormLabel fontSize={"13px"} m={2}>
-                    {!image
+                    {!image && !isEditing
                       ? "Agregar portada del proyecto"
                       : "Cambiar imagen del proyecto"}
                   </FormLabel>
@@ -314,6 +320,7 @@ const DrawerComponent: React.FC<{
                     size="md"
                     w={"100%"}
                     name={"proyectType"}
+                    value={proyect.proyectType}
                     onChange={(e) => handleChangeProyect(e)}
                     placeholder="Seleccion un tipo"
                   >
