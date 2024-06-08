@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
   const toast = useToast();
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { colorMode } = useColorMode();
 
   const [show, setShow] = useState(false);
   const [load, setLoad] = useState<boolean>(false);

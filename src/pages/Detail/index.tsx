@@ -46,7 +46,7 @@ const DetailPage = () => {
 
   const [isEditingAditional, setIsEditingAditional] = useState<boolean>(false);
   const [aditionalId, setAditionalId] = useState<string | null>(null);
-  const [aditionalIMG, setAditionalIMG] = useState<string | null>(null);
+  const [aditionalIMG, setAditionalIMG] = useState<string>("");
 
   const buttonReset = {
     borderColor: colorMode !== "light" ? "secondary" : "primary",
@@ -139,7 +139,6 @@ const DetailPage = () => {
     isLoading: editedEntryLoad,
     makeRequest: setEditedEntry,
     errorMessage: errorEditedEntry,
-    setIsLoading: setEditedEntryLoad,
   } = useFetch<ToDo>(`proyects/edit/${id}/${aditionalId}`, {
     useInitialFetch: false,
     method: "put",
@@ -188,16 +187,19 @@ const DetailPage = () => {
   }, [editedProyect]);
 
   useEffect(() => {
-    if (errorEditedProyect && errorEditedProyect.status === 400) {
-      setDeletedLoad(false);
-      toast({
-        title: `${errorEditedProyect.msg} error#${errorEditedProyect.status}`,
-        status: "error",
-        isClosable: true,
-        position: "bottom-right",
-      });
-    }
-  }, [errorEditedProyect]);
+    const errors = [errorEditedProyect, errorDeletedEntry, errorEditedEntry];
+    errors.forEach((error) => {
+      if (error && error.status === 400) {
+        setDeletedLoad(false);
+        toast({
+          title: `${error.msg} error#${error.status}`,
+          status: "error",
+          isClosable: true,
+          position: "bottom-right",
+        });
+      }
+    });
+  }, [errorEditedProyect, errorDeletedEntry, errorEditedEntry]);
 
   useEffect(() => {
     if (editedEntry && editedEntry.status === 200) {
@@ -210,6 +212,8 @@ const DetailPage = () => {
         isClosable: true,
         position: "bottom-right",
       });
+      setOpenModalAditionalDesct(false);
+      setIsEditingAditional(false);
     }
   }, [editedEntry]);
 
@@ -254,13 +258,11 @@ const DetailPage = () => {
   };
   const handleEditAditionalData = async () => {
     const formData = new FormData();
-    console.log(aditionalDescription);
-    formData.append("text", JSON.stringify(aditionalDescription));
+    formData.append("text", aditionalDescription);
 
-    console.log(aditionalIMG, "aditionalIMG");
     if (image) {
       formData.append("image", image);
-    } else formData.append("image", JSON.stringify(aditionalIMG));
+    } else formData.append("image", aditionalIMG);
 
     setEditedEntry({
       data: formData,
@@ -565,7 +567,11 @@ const DetailPage = () => {
               as="button"
               color={"white"}
               bg={colorMode === "light" ? "primary" : "secondary"}
-              //disabled={isDisabled}
+              disabled={
+                (!isEditingAditional && isDisabled) ||
+                editedEntryLoad ||
+                editedProyectLoad
+              }
               padding={"0px 16px"}
               height={"30px"}
               borderRadius={"5px"}
@@ -588,6 +594,12 @@ const DetailPage = () => {
                 color={"red.500"}
                 marginLeft={"10px"}
                 onClick={() => handleDeleteAditionalData()}
+                disabled={deletedEntryLoad}
+                _disabled={{
+                  cursor: "not-allowed",
+                  backgroundColor: "#F5F6F7",
+                  color: "#4B4F56",
+                }}
               >
                 Eliminar
               </Button>
