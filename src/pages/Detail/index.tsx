@@ -23,12 +23,13 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { LoadingComponent, DrawerComponent } from "../../components";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ToDo } from "../../interfaces";
 import { useNavigate, useParams } from "react-router-dom";
-import { HamburgerIcon, SettingsIcon } from "@chakra-ui/icons";
+import { SettingsIcon } from "@chakra-ui/icons";
 import useFetch from "../../hooks/useFetch";
 import { BsPlusSquareFill } from "react-icons/bs";
+import { GlobalContext } from "../../context/globalContex";
 const DetailPage = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -55,7 +56,7 @@ const DetailPage = () => {
     color: colorMode !== "light" ? "secondary" : "primary",
   };
   const isDisabled = image == null || aditionalDescription == "";
-  //me traigo los detalles del poryecto
+  //me traigo los detalles del proyecto
   const { data, isLoading, makeRequest, setIsLoading } = useFetch<ToDo>(
     `proyects/${id}`,
     {
@@ -63,15 +64,58 @@ const DetailPage = () => {
       method: "get",
     }
   );
+  const {
+    data: editedProyect,
+    isLoading: editedProyectLoad,
+    makeRequest: setEditedProyect,
+    errorMessage: errorEditedProyect,
+    setIsLoading: setEditedProyectLoad,
+  } = useFetch<ToDo>(`proyects/aditionalData/${id}`, {
+    useInitialFetch: false,
+    method: "put",
+  });
+
+  //editar entrada
+  const {
+    data: editedEntry,
+    isLoading: editedEntryLoad,
+    makeRequest: setEditedEntry,
+    errorMessage: errorEditedEntry,
+  } = useFetch<ToDo>(`proyects/edit/${id}/${aditionalId}`, {
+    useInitialFetch: false,
+    method: "put",
+  });
+  //eliminar entrada
+  const {
+    data: deletedEntry,
+    isLoading: deletedEntryLoad,
+    makeRequest: setDeletedEntry,
+    errorMessage: errorDeletedEntry,
+    setIsLoading: setDeletedEntryLoad,
+  } = useFetch<ToDo>(`proyects/deleteentry/${id}/${aditionalId}`, {
+    useInitialFetch: false,
+    method: "put",
+  });
+  const {
+    data: currentProyectEdited,
+    errorMessage: editMsg,
+    makeRequest: editCurrentProyect,
+  } = useFetch<ToDo>(`proyects/editproyect/${activeItem._id}`, {
+    useInitialFetch: false,
+    method: "put",
+  });
 
   useEffect(() => {
     setIsLoading(true);
     makeRequest();
-  }, []);
+  }, [currentProyectEdited, id]);
 
   useEffect(() => {
+    setIsLoading(true);
     if (data && data.status === 200) {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1500);
       setActiveItem(data.proyect);
     }
   }, [data]);
@@ -122,39 +166,6 @@ const DetailPage = () => {
     }
   };
 
-  const {
-    data: editedProyect,
-    isLoading: editedProyectLoad,
-    makeRequest: setEditedProyect,
-    errorMessage: errorEditedProyect,
-    setIsLoading: setEditedProyectLoad,
-  } = useFetch<ToDo>(`proyects/aditionalData/${id}`, {
-    useInitialFetch: false,
-    method: "put",
-  });
-
-  //editar entrada
-  const {
-    data: editedEntry,
-    isLoading: editedEntryLoad,
-    makeRequest: setEditedEntry,
-    errorMessage: errorEditedEntry,
-  } = useFetch<ToDo>(`proyects/edit/${id}/${aditionalId}`, {
-    useInitialFetch: false,
-    method: "put",
-  });
-  //eliminar entrada
-  const {
-    data: deletedEntry,
-    isLoading: deletedEntryLoad,
-    makeRequest: setDeletedEntry,
-    errorMessage: errorDeletedEntry,
-    setIsLoading: setDeletedEntryLoad,
-  } = useFetch<ToDo>(`proyects/deleteentry/${id}/${aditionalId}`, {
-    useInitialFetch: false,
-    method: "put",
-  });
-
   const handleAditionalData = async () => {
     setEditedProyectLoad(true);
     const formData = new FormData();
@@ -187,7 +198,12 @@ const DetailPage = () => {
   }, [editedProyect]);
 
   useEffect(() => {
-    const errors = [errorEditedProyect, errorDeletedEntry, errorEditedEntry];
+    const errors = [
+      errorEditedProyect,
+      errorDeletedEntry,
+      errorEditedEntry,
+      editMsg,
+    ];
     errors.forEach((error) => {
       if (error && error.status === 400) {
         setDeletedLoad(false);
@@ -199,42 +215,7 @@ const DetailPage = () => {
         });
       }
     });
-  }, [errorEditedProyect, errorDeletedEntry, errorEditedEntry]);
-
-  useEffect(() => {
-    if (editedEntry && editedEntry.status === 200) {
-      setDeletedLoad(false);
-      makeRequest();
-      toast({
-        title: `Entrada editada correctamente`,
-        description: `La entrada fue actualizada correctamente.`,
-        status: "success",
-        isClosable: true,
-        position: "bottom-right",
-      });
-      setOpenModalAditionalDesct(false);
-      setIsEditingAditional(false);
-    }
-  }, [editedEntry]);
-
-  useEffect(() => {
-    if (deletedEntry && deletedEntry.status === 200) {
-      setDeletedLoad(false);
-      makeRequest();
-      toast({
-        title: `Entrada eliminada correctamente`,
-        description: `La entrada fue eliminada correctamente.`,
-        status: "success",
-        isClosable: true,
-        position: "bottom-right",
-      });
-      setOpenModalAditionalDesct(false);
-      setIsEditingAditional(false);
-      setAditionalId(null);
-      setAditionalDescription("");
-      setImage(null);
-    }
-  }, [deletedEntry]);
+  }, [errorEditedProyect, errorDeletedEntry, errorEditedEntry, editMsg]);
 
   const openAditionalModal = (id?: string) => {
     if (id) {
@@ -271,10 +252,13 @@ const DetailPage = () => {
       },
     });
   };
-
   const handleDeleteAditionalData = async () => {
     setDeletedEntryLoad(true);
     setDeletedEntry();
+  };
+  const editCurrentProyectByID = (edited: any) => {
+    editCurrentProyect(edited);
+    makeRequest();
   };
 
   return (
@@ -377,9 +361,10 @@ const DetailPage = () => {
                 w={"100%"}
                 h={"270px"}
                 title="Imagen del proyecto"
-                backgroundImage={`${import.meta.env.VITE_URL_EP_CLOUD}${
-                  activeItem.posterPath
-                }`}
+                backgroundImage={
+                  activeItem.posterPath &&
+                  `${import.meta.env.VITE_URL_EP_CLOUD}${activeItem.posterPath}`
+                }
                 backgroundPosition="center"
                 backgroundSize="cover"
                 backgroundRepeat="no-repeat"
@@ -614,15 +599,16 @@ const DetailPage = () => {
           makeRequest();
         }}
         isEditing={true}
+        setEditProyect={editCurrentProyectByID}
         initialProyect={{
           name: activeItem.name,
-          productionUrl: activeItem.productionUrl,
-          repositoryUrl: activeItem.repositoryUrl,
-          proyectType: activeItem.proyectType,
-          description: activeItem.description,
+          productionUrl: activeItem.productionUrl || "",
+          repositoryUrl: activeItem.repositoryUrl || "",
+          proyectType: activeItem.proyectType || "",
+          description: activeItem.description || "",
           technologies: activeItem.technologyStack,
           aditionalData: activeItem.aditionalData,
-          posterPath: activeItem.posterPath,
+          posterPath: activeItem.posterPath || "",
         }}
       />
     </Box>

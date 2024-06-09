@@ -1,7 +1,6 @@
 import { User } from "firebase/auth";
 import { SignOutUser, userStateListener } from "../config/firebase-config";
 import { createContext, useState, useEffect, ReactNode } from "react";
-import { useToast } from "@chakra-ui/react";
 
 export const AuthContext = createContext({
   currentUser: {} as User | null,

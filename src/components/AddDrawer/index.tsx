@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import {
   Button,
   Drawer,
@@ -25,16 +25,26 @@ import { BsPlusSquareFill } from "react-icons/bs";
 import useFetch from "../../hooks/useFetch";
 import LoadingComponent from "../Loading";
 import { useParams } from "react-router-dom";
+import { GlobalContext } from "../../context/globalContex";
+
 const DrawerComponent: React.FC<{
   onClose: () => void;
   isOpen: boolean;
   initialProyect?: ToDo;
   isEditing?: boolean;
-}> = ({ isOpen, onClose, initialProyect, isEditing }) => {
+  setEditProyect?: (proyect: any) => void;
+}> = ({
+  isOpen,
+  onClose,
+  initialProyect,
+  isEditing,
+  setEditProyect = () => {},
+}) => {
   const toast = useToast();
   const { id } = useParams<{ id: ToDo }>();
   const { colorMode } = useColorMode();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const { setRefresPage } = useContext(GlobalContext);
 
   const [technologiesSelected, setTechnologiesSelected] = useState<string[]>(
     initialProyect?.technologies || []
@@ -120,13 +130,10 @@ const DrawerComponent: React.FC<{
     });
   };
   const { data, isLoading, errorMessage, makeRequest, setIsLoading } =
-    useFetch<ToDo>(
-      isEditing ? `proyects/editproyect/${id}` : "proyects/create",
-      {
-        useInitialFetch: false,
-        method: isEditing ? "put" : "post",
-      }
-    );
+    useFetch<ToDo>("proyects/create", {
+      useInitialFetch: false,
+      method: "post",
+    });
 
   useEffect(() => {
     if ((!data && errorMessage.status === 400) || errorMessage.status === 404) {
@@ -157,15 +164,16 @@ const DrawerComponent: React.FC<{
 
     const formData = new FormData();
     proyect.technologyStack = technologiesSelected;
+
     formData.append("proyect", JSON.stringify(proyect));
     if (image) {
       formData.append("image", image);
     }
     if (isEditing) {
-      makeRequest({
-        data: proyect,
+      setEditProyect({
+        data: formData,
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       });
     } else {

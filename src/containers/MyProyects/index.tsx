@@ -29,15 +29,25 @@ const MyProyects = () => {
     } else setProyectsData([]);
   }, [proyectsFetch]);
 
+  const truncateText = (text: string, maxLength: number) => {
+    console.log(text);
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    }
+    return text;
+  };
+
   return (
     <SimpleGrid
       spacing={4}
       templateColumns={{
-        base: "repeat(auto-fill, minmax(45%, 1fr))",
+        base: "1fr",
+        sm: "repeat(auto-fill, minmax(45%, 1fr))",
         md: "repeat(auto-fill, minmax(30%, 1fr))",
       }}
       templateRows={{
-        base: "repeat(auto-fill, minmax(250px, 1fr))",
+        base: "1fr",
+        sm: "repeat(auto-fill, minmax(250px, 1fr))",
         md: "repeat(auto-fill, minmax(250px, 1fr))",
       }}
       overflow={"hidden"}
@@ -46,7 +56,10 @@ const MyProyects = () => {
       padding={"10px"}
     >
       {proyectsData.map((item: ToDo) => (
-        <Card bg={colorMode === "light" ? "bgLigthtMode" : "bgDarkMode"}>
+        <Card
+          height={"250px"}
+          bg={colorMode === "light" ? "bgLigthtMode" : "bgDarkMode"}
+        >
           <CardHeader padding={"10px"}>
             <Heading
               fontSize={"34px"}
@@ -57,7 +70,14 @@ const MyProyects = () => {
             </Heading>
           </CardHeader>
           <CardBody padding={"10px"}>
-            <Text fontSize={"13px"}>{item.description}</Text>
+            <Text
+              fontSize={"13px"}
+              overflow="hidden"
+              textOverflow="ellipsis"
+              display="-webkit-box"
+            >
+              {item.description && truncateText(item?.description, 200)}
+            </Text>
           </CardBody>
           <CardFooter padding={"10px"} justifyContent={"end"}>
             <Link to={`/${item._id}`}>Ver detalle</Link>
