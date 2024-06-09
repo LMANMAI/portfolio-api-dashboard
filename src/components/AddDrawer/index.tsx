@@ -24,7 +24,7 @@ import { ToDo } from "../../interfaces";
 import { BsPlusSquareFill } from "react-icons/bs";
 import useFetch from "../../hooks/useFetch";
 import LoadingComponent from "../Loading";
-import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { GlobalContext } from "../../context/globalContex";
 
 const DrawerComponent: React.FC<{
@@ -41,7 +41,7 @@ const DrawerComponent: React.FC<{
   setEditProyect = () => {},
 }) => {
   const toast = useToast();
-  const { id } = useParams<{ id: ToDo }>();
+  const navigate = useNavigate();
   const { colorMode } = useColorMode();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { setRefresPage } = useContext(GlobalContext);
@@ -183,6 +183,7 @@ const DrawerComponent: React.FC<{
           "Content-Type": "multipart/form-data",
         },
       });
+      navigate("/");
     }
     onClose();
   };
@@ -371,6 +372,7 @@ const DrawerComponent: React.FC<{
                 <Textarea
                   resize={"none"}
                   name="description"
+                  height={"275px"}
                   value={proyect.description}
                   onChange={(e) => handleChangeProyect(e)}
                   placeholder="Descripción de lo desarrollado."

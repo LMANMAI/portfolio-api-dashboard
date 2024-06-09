@@ -9,11 +9,11 @@ import { GlobalProvider } from "./context/globalContex";
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <ThemeProvider>
-      <AuthProvider>
-        <GlobalProvider>
+      <GlobalProvider>
+        <AuthProvider>
           <App />
-        </GlobalProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </GlobalProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

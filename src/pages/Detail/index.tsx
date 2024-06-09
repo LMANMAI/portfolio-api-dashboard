@@ -23,13 +23,12 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { LoadingComponent, DrawerComponent } from "../../components";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ToDo } from "../../interfaces";
 import { useNavigate, useParams } from "react-router-dom";
 import { SettingsIcon } from "@chakra-ui/icons";
 import useFetch from "../../hooks/useFetch";
 import { BsPlusSquareFill } from "react-icons/bs";
-import { GlobalContext } from "../../context/globalContex";
 const DetailPage = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -113,9 +112,9 @@ const DetailPage = () => {
   useEffect(() => {
     setIsLoading(true);
     if (data && data.status === 200) {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1500);
+      // setTimeout(() => {
+      setIsLoading(false);
+      //}, 750);
       setActiveItem(data.proyect);
     }
   }, [data]);
@@ -257,6 +256,7 @@ const DetailPage = () => {
     setDeletedEntry();
   };
   const editCurrentProyectByID = (edited: any) => {
+    setIsLoading(true);
     editCurrentProyect(edited);
     makeRequest();
   };
@@ -596,7 +596,6 @@ const DetailPage = () => {
         isOpen={openDrawerEdit}
         onClose={() => {
           setOpenDrawerEdit(false);
-          makeRequest();
         }}
         isEditing={true}
         setEditProyect={editCurrentProyectByID}
