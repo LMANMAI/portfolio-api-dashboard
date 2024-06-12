@@ -63,7 +63,6 @@ export default function useFetch<T>(
           ...requestOptions,
           data: requestOptions?.data || options?.data,
           headers: {
-            id_channel: "sucursal",
             "api-key": import.meta.env.VITE_API_KEY_BE as string,
             ...options.headers,
             ...requestOptions?.headers,
