@@ -10,27 +10,11 @@ import {
 } from "@chakra-ui/react";
 import { ToDo } from "../../interfaces";
 import { Link } from "react-router-dom";
-import useFetch from "../../hooks/useFetch";
-import { useContext, useEffect, useState } from "react";
-import { GlobalContext } from "../../context/globalContex";
-const MyProyects = () => {
-  const [proyectsData, setProyectsData] = useState<ToDo[]>([]);
-  const { refreshPage, setRefresPage } = useContext(GlobalContext);
+const MyProyects: React.FC<{ isLoading: boolean; proyectsData: ToDo[] }> = ({
+  isLoading,
+  proyectsData,
+}) => {
   const { colorMode } = useColorMode();
-  const {
-    data: proyectsFetch,
-    isLoading,
-    makeRequest: getProyects,
-  } = useFetch<any>("proyects", {
-    useInitialFetch: true,
-    method: "get",
-  });
-
-  useEffect(() => {
-    if (proyectsFetch && proyectsFetch.status === 200) {
-      setProyectsData(proyectsFetch.proyects);
-    } else setProyectsData([]);
-  }, [proyectsFetch]);
 
   return (
     <>

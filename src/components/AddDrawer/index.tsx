@@ -183,6 +183,7 @@ const DrawerComponent: React.FC<{
           "Content-Type": "multipart/form-data",
         },
       });
+      setRefresPage(true);
       navigate("/");
     }
     onClose();

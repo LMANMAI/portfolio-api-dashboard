@@ -24,6 +24,7 @@ function App() {
       return;
     }
   }, [currentUser, window.location.pathname]);
+
   return (
     <ChakraBaseProvider theme={theme}>
       <ColorModeProvider value={colorMode}>

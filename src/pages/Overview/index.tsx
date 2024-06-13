@@ -16,11 +16,36 @@ import { MyProyects, SkillsAndTools } from "../../containers";
 import { BsFillDoorOpenFill, BsPlusSquareFill } from "react-icons/bs";
 import { SignOutUser } from "../../config/firebase-config";
 import { DrawerComponent } from "../../components";
+import useFetch from "../../hooks/useFetch";
+import { useContext, useEffect, useState } from "react";
+import { ToDo } from "../../interfaces";
+import { GlobalContext } from "../../context/globalContex";
 
 const OverviewPage = () => {
   const toast = useToast();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { refreshPage, setRefresPage } = useContext(GlobalContext);
+  const [proyectsData, setProyectsData] = useState<ToDo[]>([]);
+  const {
+    data: proyectsFetch,
+    isLoading,
+    makeRequest: getProyects,
+  } = useFetch<any>("proyects", {
+    useInitialFetch: true,
+    method: "get",
+  });
+
+  useEffect(() => {
+    if (proyectsFetch && proyectsFetch.status === 200) {
+      setProyectsData(proyectsFetch.proyects);
+      setRefresPage(false);
+    } else setProyectsData([]);
+  }, [proyectsFetch]);
+
+  useEffect(() => {
+    if (refreshPage) getProyects();
+  }, [refreshPage]);
 
   return (
     <Box
@@ -60,7 +85,7 @@ const OverviewPage = () => {
 
         <TabPanels h={"100%"}>
           <TabPanel padding={"10px 5px"}>
-            <MyProyects />
+            <MyProyects isLoading={isLoading} proyectsData={proyectsData} />
           </TabPanel>
           <TabPanel padding={"10px 5px"}>
             <SkillsAndTools />
