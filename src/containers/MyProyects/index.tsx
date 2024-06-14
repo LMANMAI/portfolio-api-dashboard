@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { ToDo } from "../../interfaces";
 import { Link } from "react-router-dom";
+import { LoadingComponent } from "../../components";
 const MyProyects: React.FC<{ isLoading: boolean; proyectsData: ToDo[] }> = ({
   isLoading,
   proyectsData,
@@ -19,7 +20,7 @@ const MyProyects: React.FC<{ isLoading: boolean; proyectsData: ToDo[] }> = ({
   return (
     <>
       {isLoading ? (
-        "cargando"
+        <LoadingComponent loading={isLoading} label="Obteniendo proyectos" />
       ) : (
         <SimpleGrid
           spacing={4}

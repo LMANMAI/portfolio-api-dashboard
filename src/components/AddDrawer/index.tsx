@@ -153,6 +153,7 @@ const DrawerComponent: React.FC<{
         position: "bottom-right",
       });
       clearForm();
+      setRefresPage(true);
     }
   }, [data, errorMessage]);
 
@@ -183,7 +184,7 @@ const DrawerComponent: React.FC<{
           "Content-Type": "multipart/form-data",
         },
       });
-      setRefresPage(true);
+
       navigate("/");
     }
     onClose();
