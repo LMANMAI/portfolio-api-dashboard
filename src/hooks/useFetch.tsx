@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import axios, { AxiosError, Method } from "axios";
+import axios, { Method } from "axios";
 import { ToDo } from "../interfaces";
 
 type AllowedMethods = "get" | "post" | "put" | "delete";
@@ -46,7 +46,6 @@ export default function useFetch<T>(
       const { method } = options;
       let response;
 
-      // Mapeo de métodos permitidos a los métodos de Axios
       const axiosMethods: Record<AllowedMethods, Method> = {
         get: "get",
         post: "post",

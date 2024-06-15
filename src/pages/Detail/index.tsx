@@ -4,34 +4,21 @@ import {
   Tag,
   Text,
   useColorMode,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  IconButton,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
   useToast,
-  Icon,
-  FormLabel,
-  Textarea,
 } from "@chakra-ui/react";
-import { LoadingComponent, DrawerComponent } from "../../components";
-import { useEffect, useRef, useState } from "react";
+import {
+  LoadingComponent,
+  DrawerComponent,
+  DeleteProjectModal,
+  AddDescriptionModal,
+  ProjectOptionsMenu,
+} from "../../components";
+import { useEffect, useState } from "react";
 import { ToDo } from "../../interfaces";
 import { useNavigate, useParams } from "react-router-dom";
-import { SettingsIcon } from "@chakra-ui/icons";
 import useFetch from "../../hooks/useFetch";
-import { BsPlusSquareFill } from "react-icons/bs";
-const DetailPage = () => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
+const DetailPage = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const { id } = useParams<{ id: ToDo }>();
@@ -55,6 +42,7 @@ const DetailPage = () => {
     color: colorMode !== "light" ? "secondary" : "primary",
   };
   const isDisabled = image == null || aditionalDescription == "";
+
   //me traigo los detalles del proyecto
   const { data, isLoading, makeRequest, setIsLoading } = useFetch<ToDo>(
     `proyects/${id}`,
@@ -76,7 +64,6 @@ const DetailPage = () => {
 
   //editar entrada
   const {
-    data: editedEntry,
     isLoading: editedEntryLoad,
     makeRequest: setEditedEntry,
     errorMessage: errorEditedEntry,
@@ -84,10 +71,9 @@ const DetailPage = () => {
     useInitialFetch: false,
     method: "put",
   });
+
   //eliminar entrada
   const {
-    data: deletedEntry,
-    isLoading: deletedEntryLoad,
     makeRequest: setDeletedEntry,
     errorMessage: errorDeletedEntry,
     setIsLoading: setDeletedEntryLoad,
@@ -107,6 +93,9 @@ const DetailPage = () => {
   useEffect(() => {
     setIsLoading(true);
     makeRequest();
+    if (currentProyectEdited && currentProyectEdited.status === 200) {
+      setIsLoading(false);
+    }
   }, [currentProyectEdited, id]);
 
   useEffect(() => {
@@ -156,14 +145,6 @@ const DetailPage = () => {
       });
     }
   }, [proyectDeleted, errorMessage]);
-
-  //Adicion de la descripcion extra
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImage(file);
-    }
-  };
 
   const handleAditionalData = async () => {
     setEditedProyectLoad(true);
@@ -287,42 +268,12 @@ const DetailPage = () => {
             >
               {activeItem?.name}
             </Text>
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                aria-label="Options"
-                icon={<SettingsIcon />}
-                variant="outline"
-                color={"white"}
-                transition="all 0.2s"
-                bg={colorMode === "light" ? "primary" : "secondary"}
-                _active={buttonReset}
-                _hover={buttonReset}
-              />
-              <MenuList color={colorMode === "light" ? "#2c2c2c" : "white"}>
-                <MenuItem
-                  onClick={() => {
-                    setOpenDrawerEdit(true);
-                  }}
-                >
-                  Editar proyecto
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    setOpenModalAditionalDesct(true);
-                  }}
-                >
-                  Agregar seccion adicional
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    setOpenModal(true);
-                  }}
-                >
-                  Eliminar Proyecto
-                </MenuItem>
-              </MenuList>
-            </Menu>
+            <ProjectOptionsMenu
+              setOpenDrawerEdit={setOpenDrawerEdit}
+              setOpenModalAditionalDesct={setOpenModalAditionalDesct}
+              setOpenModal={setOpenModal}
+              buttonReset={buttonReset}
+            />
           </Stack>
           <div
             style={{
@@ -395,203 +346,31 @@ const DetailPage = () => {
         </Stack>
       )}
 
-      <Modal
-        closeOnOverlayClick={false}
-        isOpen={openModal}
-        isCentered
-        onClose={() => setOpenModal(false)}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Eliminar proyecto</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {deletedLoad ? (
-              <LoadingComponent
-                loading={deletedLoad}
-                label="Eliminando el proyecto"
-              />
-            ) : (
-              <Text>
-                ¿Está seguro que desea eliminar el proyecto "
-                <strong>{activeItem.name}</strong>"? Este será eliminado y no se
-                podrá recuperar.
-              </Text>
-            )}
-          </ModalBody>
+      <DeleteProjectModal
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+        deletedLoad={deletedLoad}
+        activeItem={activeItem}
+        handleDeleteProyect={handleDeleteProyect}
+      />
+      <AddDescriptionModal
+        openModalAditionalDesct={openModalAditionalDesct}
+        setOpenModalAditionalDesct={setOpenModalAditionalDesct}
+        deletedLoad={deletedLoad}
+        image={image}
+        setImage={setImage}
+        activeItem={activeItem}
+        aditionalDescription={aditionalDescription}
+        setAditionalDescription={setAditionalDescription}
+        isEditingAditional={isEditingAditional}
+        isDisabled={isDisabled}
+        editedEntryLoad={editedEntryLoad}
+        editedProyectLoad={editedProyectLoad}
+        handleEditAditionalData={handleEditAditionalData}
+        handleAditionalData={handleAditionalData}
+        handleDeleteAditionalData={handleDeleteAditionalData}
+      />
 
-          <ModalFooter>
-            <Button variant="secondary" onClick={() => setOpenModal(false)}>
-              Cancelar
-            </Button>
-            <Button
-              color={"white"}
-              transition="all 0.2s"
-              bg={colorMode === "light" ? "primary" : "secondary"}
-              _active={buttonReset}
-              onClick={() => handleDeleteProyect()}
-            >
-              Eliminar
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      <Modal
-        closeOnOverlayClick={false}
-        isOpen={openModalAditionalDesct}
-        isCentered
-        size={"xl"}
-        onClose={() => setOpenModalAditionalDesct(false)}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Agregar descripcion adicional</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {deletedLoad ? (
-              <LoadingComponent
-                loading={deletedLoad}
-                label="Eliminando el proyecto"
-              />
-            ) : (
-              <Stack>
-                {/*Boton para agregar imagen*/}
-                <Stack
-                  flexDirection={"row"}
-                  justifyContent={"end"}
-                  alignItems={"end"}
-                  width={"100%"}
-                  h={"150px"}
-                  marginBottom={"5px"}
-                  title="Agregar imagen de portada al proyecto"
-                  backgroundImage={
-                    isEditingAditional && !image
-                      ? `${import.meta.env.VITE_URL_EP_CLOUD}${aditionalIMG}`
-                      : `url(${image !== null && URL.createObjectURL(image)})`
-                  }
-                  backgroundColor={
-                    !image
-                      ? `${
-                          colorMode === "light" ? "bgLigthtMode" : "bgDarkMode"
-                        }`
-                      : ""
-                  }
-                  backgroundSize="cover"
-                  backgroundPosition="center"
-                  borderRadius={"5px"}
-                  _hover={!image ? {} : { opacity: 0.75 }}
-                  position={"relative"}
-                >
-                  <Button
-                    variant={"primary"}
-                    color={"white"}
-                    width={"100%"}
-                    h={"100%"}
-                    _hover={{ opacity: 0.5 }}
-                    flexDirection={"column"}
-                  >
-                    <Icon fontSize={30} as={BsPlusSquareFill} />
-                    <FormLabel fontSize={"13px"} m={2}>
-                      {!aditionalIMG
-                        ? "Agregar portada del proyecto"
-                        : "Cambiar imagen del proyecto"}
-                    </FormLabel>
-                    <input
-                      type="file"
-                      ref={inputRef}
-                      style={{
-                        position: "absolute",
-                        width: "100%",
-                        height: "100%",
-                        opacity: 0,
-                        cursor: "pointer",
-                      }}
-                      accept="*.jpeg"
-                      onChange={handleFileChange}
-                    />
-                  </Button>
-                  <Button
-                    onClick={() => setImage(null)}
-                    h="10px"
-                    width="10px"
-                    fontSize={"10px"}
-                    position={"absolute"}
-                    right={"5px"}
-                    bottom={"5px"}
-                    className="delete_button"
-                    visibility={image ? "visible" : "hidden"}
-                    zIndex={2}
-                    title="Eliminar imagen"
-                  >
-                    X
-                  </Button>
-                </Stack>
-                <div style={{ margin: "10px 0px" }}>
-                  <FormLabel>Descripcion del proyecto</FormLabel>
-                  <Textarea
-                    resize={"none"}
-                    name="description"
-                    value={aditionalDescription}
-                    onChange={(e) => setAditionalDescription(e.target.value)}
-                    placeholder="Descripción de lo desarrollado."
-                  />
-                </div>
-              </Stack>
-            )}
-          </ModalBody>
-
-          <ModalFooter>
-            <Button
-              variant="secondary"
-              onClick={() => setOpenModalAditionalDesct(false)}
-            >
-              Cerrar
-            </Button>
-            <Box
-              as="button"
-              color={"white"}
-              bg={colorMode === "light" ? "primary" : "secondary"}
-              disabled={
-                (!isEditingAditional && isDisabled) ||
-                editedEntryLoad ||
-                editedProyectLoad
-              }
-              padding={"0px 16px"}
-              height={"30px"}
-              borderRadius={"5px"}
-              _active={buttonReset}
-              onClick={() => {
-                isEditingAditional
-                  ? handleEditAditionalData()
-                  : handleAditionalData();
-              }}
-              _disabled={{
-                cursor: "not-allowed",
-                backgroundColor: "#F5F6F7",
-                color: "#4B4F56",
-              }}
-            >
-              {isEditingAditional ? "Editar" : "Agregar"}
-            </Box>
-            {isEditingAditional && (
-              <Button
-                color={"red.500"}
-                marginLeft={"10px"}
-                onClick={() => handleDeleteAditionalData()}
-                disabled={deletedEntryLoad}
-                _disabled={{
-                  cursor: "not-allowed",
-                  backgroundColor: "#F5F6F7",
-                  color: "#4B4F56",
-                }}
-              >
-                Eliminar
-              </Button>
-            )}
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
       <DrawerComponent
         isOpen={openDrawerEdit}
         onClose={() => {
@@ -599,6 +378,7 @@ const DetailPage = () => {
         }}
         isEditing={true}
         setEditProyect={editCurrentProyectByID}
+        isLoading={isLoading}
         initialProyect={{
           name: activeItem.name,
           productionUrl: activeItem.productionUrl || "",

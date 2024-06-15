@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Button,
   Drawer,
@@ -8,42 +8,37 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  Stack,
-  Input,
   FormControl,
-  FormLabel,
-  Textarea,
-  Select,
   Tag,
   useColorMode,
-  Icon,
   Box,
   useToast,
 } from "@chakra-ui/react";
 import { ToDo } from "../../interfaces";
-import { BsPlusSquareFill } from "react-icons/bs";
 import useFetch from "../../hooks/useFetch";
-import LoadingComponent from "../Loading";
+import { LoadingComponent, CoverImageUploader } from "../index";
 import { useNavigate } from "react-router-dom";
 import { GlobalContext } from "../../context/globalContex";
-
+import { FormLabelInput, FormLabelSelect, FormLabelTextarea } from "../";
 const DrawerComponent: React.FC<{
   onClose: () => void;
   isOpen: boolean;
   initialProyect?: ToDo;
   isEditing?: boolean;
+  isLoading?: boolean;
   setEditProyect?: (proyect: any) => void;
 }> = ({
   isOpen,
   onClose,
   initialProyect,
   isEditing,
+  isLoading = false,
   setEditProyect = () => {},
 }) => {
   const toast = useToast();
   const navigate = useNavigate();
   const { colorMode } = useColorMode();
-  const inputRef = useRef<HTMLInputElement | null>(null);
+
   const { setRefresPage } = useContext(GlobalContext);
 
   const [technologiesSelected, setTechnologiesSelected] = useState<string[]>(
@@ -80,12 +75,7 @@ const DrawerComponent: React.FC<{
         technologiesSelected.filter((item: string) => item !== value)
       );
   };
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImage(file);
-    }
-  };
+
   const handleChangeProyect = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -129,11 +119,16 @@ const DrawerComponent: React.FC<{
       description: "",
     });
   };
-  const { data, isLoading, errorMessage, makeRequest, setIsLoading } =
-    useFetch<ToDo>("proyects/create", {
-      useInitialFetch: false,
-      method: "post",
-    });
+  const {
+    data,
+    isLoading: loadingCreate,
+    errorMessage,
+    makeRequest,
+    setIsLoading,
+  } = useFetch<ToDo>("proyects/create", {
+    useInitialFetch: false,
+    method: "post",
+  });
 
   useEffect(() => {
     if ((!data && errorMessage.status === 400) || errorMessage.status === 404) {
@@ -153,6 +148,7 @@ const DrawerComponent: React.FC<{
         position: "bottom-right",
       });
       clearForm();
+      onClose();
       setRefresPage(true);
     }
   }, [data, errorMessage]);
@@ -187,7 +183,6 @@ const DrawerComponent: React.FC<{
 
       navigate("/");
     }
-    onClose();
   };
 
   const isDisabled =
@@ -206,180 +201,99 @@ const DrawerComponent: React.FC<{
         </DrawerHeader>
 
         <DrawerBody>
-          {isLoading ? (
+          {isLoading || loadingCreate ? (
             <LoadingComponent
-              loading={isLoading}
+              loading={isLoading || loadingCreate}
               label={isEditing ? "Actualizando proyecto" : "Guardando proyecto"}
             />
           ) : (
             <FormControl>
-              {/*Boton para agregar imagen*/}
-              <Stack
-                flexDirection={"row"}
-                justifyContent={"end"}
-                alignItems={"end"}
-                width={"100%"}
-                h={"150px"}
-                marginBottom={"5px"}
-                title="Agregar imagen de portada al proyecto"
-                backgroundImage={
-                  image
-                    ? `url(${URL.createObjectURL(image)})`
-                    : isEditing
-                    ? `${import.meta.env.VITE_URL_EP_CLOUD}${
-                        initialProyect.posterPath
-                      }`
-                    : ""
-                }
-                backgroundColor={
-                  !image
-                    ? `${colorMode === "light" ? "bgLigthtMode" : "bgDarkMode"}`
-                    : ""
-                }
-                backgroundSize="cover"
-                backgroundPosition="center"
-                borderRadius={"5px"}
-                _hover={!image ? {} : { opacity: 0.75 }}
-                position={"relative"}
-              >
-                <Button
-                  variant={"primary"}
-                  color={"white"}
-                  width={"100%"}
-                  h={"100%"}
-                  _hover={{ opacity: 0.5 }}
-                  flexDirection={"column"}
-                >
-                  <Icon fontSize={30} as={BsPlusSquareFill} />
-                  <FormLabel fontSize={"13px"} m={2}>
-                    {!image && !isEditing
-                      ? "Agregar portada del proyecto"
-                      : "Cambiar imagen del proyecto"}
-                  </FormLabel>
-                  <input
-                    type="file"
-                    ref={inputRef}
-                    style={{
-                      position: "absolute",
-                      width: "100%",
-                      height: "100%",
-                      opacity: 0,
-                      cursor: "pointer",
-                    }}
-                    accept="*.jpeg"
-                    onChange={handleFileChange}
-                  />
-                </Button>
-                <Button
-                  onClick={() => setImage(null)}
-                  h="10px"
-                  width="10px"
-                  fontSize={"10px"}
-                  position={"absolute"}
-                  right={"5px"}
-                  bottom={"5px"}
-                  className="delete_button"
-                  visibility={image ? "visible" : "hidden"}
-                  zIndex={2}
-                  title="Eliminar imagen"
-                >
-                  X
-                </Button>
-              </Stack>
+              <CoverImageUploader
+                image={image}
+                setImage={setImage}
+                isEditing={isEditing || false}
+                initialProyect={initialProyect}
+              />
               <div
                 style={{ display: "flex", gap: "10px", margin: "2.5px 0px" }}
               >
-                <div style={{ width: "100%" }}>
-                  <FormLabel>* Nombre del proyecto</FormLabel>
-                  <Input
-                    name="name"
-                    value={proyect.name}
-                    onChange={(e) => handleChangeProyect(e)}
-                    placeholder="Nombre del proyecto"
-                  />
-                </div>
-                <div style={{ width: "100%" }}>
-                  <FormLabel>* Url del proyecto</FormLabel>
-                  <Input
-                    name="productionUrl"
-                    value={proyect.productionUrl}
-                    onChange={(e) => handleChangeProyect(e)}
-                    placeholder="https://url.vercel.com"
-                  />
-                  {urlErrors.productionUrl && (
-                    <p style={{ color: "red" }}>{urlErrors.productionUrl}</p>
-                  )}
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", margin: "5px 0px" }}>
-                <div style={{ width: "100%" }}>
-                  <FormLabel>* Url del repositorio</FormLabel>
-                  <Input
-                    name="repositoryUrl"
-                    value={proyect.repositoryUrl}
-                    onChange={(e) => handleChangeProyect(e)}
-                    placeholder="https://github.com/LMANMAI"
-                  />
-                  {urlErrors.repositoryUrl && (
-                    <p style={{ color: "red" }}>{urlErrors.repositoryUrl}</p>
-                  )}
-                </div>
-
-                <div style={{ width: "100%" }}>
-                  <FormLabel>* Tipo de proyecto</FormLabel>
-                  <Select
-                    size="md"
-                    w={"100%"}
-                    name={"proyectType"}
-                    value={proyect.proyectType}
-                    onChange={(e) => handleChangeProyect(e)}
-                    placeholder="Seleccion un tipo"
-                  >
-                    <option value="Front_end">Frontend</option>
-                    <option value="Back_end">Backend</option>
-                  </Select>
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "10px", margin: "5px 0px" }}>
-                <div style={{ width: "100%" }}>
-                  <FormLabel>* Tecnologias</FormLabel>
-
-                  <Select
-                    size="md"
-                    w={"100%"}
-                    placeholder="Seleccionar tecnologias"
-                    onChange={handleChange}
-                  >
-                    {/*Esto deberia cargarse con un endpoint, el mismo que traiiga las skiills y herramientas*/}
-                    <option value="Rect.js">Rect.js</option>
-                    <option value="Node.js">Node.js</option>
-                    <option value="Mongo DB">Mongo DB</option>
-                    <option value="Figma">Figma</option>
-                    <option value="React Native">React Native</option>
-                    <option value="CSS">CSS</option>
-                  </Select>
-
-                  <div
-                    style={{ display: "flex", gap: "10px", margin: "10px 0px" }}
-                  >
-                    {technologiesSelected.length > 0 &&
-                      technologiesSelected.map((item: string) => (
-                        <Tag>{item}</Tag>
-                      ))}
-                  </div>
-                </div>
-              </div>
-              <div style={{ margin: "10px 0px" }}>
-                <FormLabel>Descripcion del proyecto</FormLabel>
-                <Textarea
-                  resize={"none"}
-                  name="description"
-                  height={"275px"}
-                  value={proyect.description}
-                  onChange={(e) => handleChangeProyect(e)}
-                  placeholder="Descripción de lo desarrollado."
+                <FormLabelInput
+                  label="* Nombre del proyecto"
+                  name="name"
+                  value={proyect.name}
+                  onChange={handleChangeProyect}
+                  placeholder="Nombre del proyecto"
+                />
+                <FormLabelInput
+                  label="* Url del proyecto"
+                  name="productionUrl"
+                  value={proyect.productionUrl}
+                  onChange={handleChangeProyect}
+                  placeholder="https://url.vercel.com"
+                  errorMessage={urlErrors.productionUrl}
                 />
               </div>
+              <div style={{ display: "flex", gap: "10px", margin: "5px 0px" }}>
+                <FormLabelInput
+                  label="* Url del repositorio"
+                  name="repositoryUrl"
+                  value={proyect.repositoryUrl}
+                  onChange={handleChangeProyect}
+                  placeholder="https://github.com/LMANMAI"
+                  errorMessage={urlErrors.repositoryUrl}
+                />
+                <FormLabelSelect
+                  label="* Tipo de proyecto"
+                  name="proyectType"
+                  value={proyect.proyectType}
+                  onChange={handleChangeProyect}
+                  placeholder="Seleccionar un tipo"
+                  options={[
+                    { value: "Front_end", label: "Frontend" },
+                    { value: "Back_end", label: "Backend" },
+                  ]}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  margin: "5px 0px",
+                  flexDirection: "column",
+                }}
+              >
+                <FormLabelSelect
+                  label="* Tecnologías"
+                  name="technologies"
+                  value=""
+                  onChange={handleChange}
+                  placeholder="Seleccionar tecnologías"
+                  options={[
+                    { value: "React.js", label: "React.js" },
+                    { value: "Node.js", label: "Node.js" },
+                    { value: "Mongo DB", label: "Mongo DB" },
+                    { value: "Figma", label: "Figma" },
+                    { value: "React Native", label: "React Native" },
+                    { value: "CSS", label: "CSS" },
+                  ]}
+                />
+                <div
+                  style={{ display: "flex", gap: "10px", margin: "10px 0px" }}
+                >
+                  {technologiesSelected.length > 0 &&
+                    technologiesSelected.map((item: string) => (
+                      <Tag key={item}>{item}</Tag>
+                    ))}
+                </div>
+              </div>
+              <FormLabelTextarea
+                label="Descripción del proyecto"
+                name="description"
+                value={proyect.description}
+                onChange={handleChangeProyect}
+                placeholder="Descripción de lo desarrollado."
+                height={"200px"}
+              />
             </FormControl>
           )}
         </DrawerBody>
