@@ -58,7 +58,6 @@ const CoverImageUploader: React.FC<CoverImageUploaderProps> = ({
         h={"100%"}
         _hover={{ opacity: 0.5 }}
         flexDirection={"column"}
-        // onClick={() => inputRef.current?.click()}
       >
         <Icon fontSize={30} as={BsPlusSquareFill} />
         <FormLabel fontSize={"13px"} m={2}>

@@ -7,3 +7,4 @@ export { default as ProjectOptionsMenu } from "./ProjectOptionsMenu";
 export { default as FormLabelTextarea } from "./FormLabelTextarea";
 export { default as FormLabelSelect } from "./FormLabelSelect";
 export { default as FormLabelInput } from "./FormLabelInput";
+export { default as AddSkillsModal } from "./Modals/AddSkillsModal";

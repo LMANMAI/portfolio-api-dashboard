@@ -27,11 +27,22 @@ const OverviewPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { refreshPage, setRefresPage } = useContext(GlobalContext);
   const [proyectsData, setProyectsData] = useState<ToDo[]>([]);
+  const [skillsData, setSkillsData] = useState<ToDo[]>([]);
+
   const {
     data: proyectsFetch,
     isLoading,
     makeRequest: getProyects,
   } = useFetch<any>("proyects", {
+    useInitialFetch: true,
+    method: "get",
+  });
+
+  const {
+    data: skillsFetch,
+    isLoading: loadingSkills,
+    makeRequest: getSkills,
+  } = useFetch<any>("skills", {
     useInitialFetch: true,
     method: "get",
   });
@@ -44,7 +55,17 @@ const OverviewPage = () => {
   }, [proyectsFetch]);
 
   useEffect(() => {
-    if (refreshPage) getProyects();
+    if (skillsFetch && skillsFetch.status === 200) {
+      setSkillsData(skillsFetch.skills);
+      setRefresPage(false);
+    } else setSkillsData([]);
+  }, [skillsFetch]);
+
+  useEffect(() => {
+    if (refreshPage) {
+      getProyects();
+      getSkills();
+    }
   }, [refreshPage]);
 
   return (
@@ -88,7 +109,7 @@ const OverviewPage = () => {
             <MyProyects isLoading={isLoading} proyectsData={proyectsData} />
           </TabPanel>
           <TabPanel padding={"10px 5px"}>
-            <SkillsAndTools />
+            <SkillsAndTools isLoading={loadingSkills} skilsData={skillsData} />
           </TabPanel>
         </TabPanels>
       </Tabs>
