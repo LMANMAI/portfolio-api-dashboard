@@ -40,8 +40,7 @@ const SkillsAndTools: React.FC<{
   });
 
   useEffect(() => {
-    if (!data || errorMessage.status === 404) {
-      console.log("object", errorMessage);
+    if (!data && errorMessage.status === 404) {
       toast({
         title: `${errorMessage.msg}`,
         status: "error",
@@ -49,7 +48,6 @@ const SkillsAndTools: React.FC<{
         position: "bottom-right",
       });
     } else if (data && data.status === 200) {
-      console.log("object");
       toast({
         title: `${data.message}`,
         status: "success",
