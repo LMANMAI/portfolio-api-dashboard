@@ -59,12 +59,8 @@ const DrawerComponent: React.FC<{
     productionUrl: "",
     repositoryUrl: "",
   });
-  useEffect(() => {
-    if (initialProyect) {
-      setProyect(initialProyect);
-      setTechnologiesSelected(initialProyect.technologies || []);
-    }
-  }, [initialProyect]);
+  const [skillsFormated, setSkillsFormated] = useState<ToDo>([]);
+
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target;
     const alreadyIncluded = technologiesSelected.includes(value);
@@ -100,59 +96,6 @@ const DrawerComponent: React.FC<{
       [name]: value,
     }));
   };
-
-  const isValidUrl = (url: string) => {
-    const urlPattern = new RegExp(
-      /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi
-    );
-    return !!urlPattern.test(url);
-  };
-  const clearForm = () => {
-    setIsLoading(false);
-    setTechnologiesSelected([]);
-    setImage(null);
-    setProyect({
-      name: "",
-      productionUrl: "",
-      repositoryUrl: "",
-      proyectType: "",
-      description: "",
-    });
-  };
-  const {
-    data,
-    isLoading: loadingCreate,
-    errorMessage,
-    makeRequest,
-    setIsLoading,
-  } = useFetch<ToDo>("proyects/create", {
-    useInitialFetch: false,
-    method: "post",
-  });
-
-  useEffect(() => {
-    if ((!data && errorMessage.status === 400) || errorMessage.status === 404) {
-      toast({
-        title: `${errorMessage.msg}`,
-        description: "Revisa los datos y volve a enviar el proyecto",
-        status: "error",
-        isClosable: true,
-        position: "bottom-right",
-      });
-    } else if (data && data.status === 200) {
-      toast({
-        title: `${data.message}`,
-        description: "Se restablecera el formulario.",
-        status: "success",
-        isClosable: true,
-        position: "bottom-right",
-      });
-      clearForm();
-      onClose();
-      setRefresPage(true);
-    }
-  }, [data, errorMessage]);
-
   const handleSubmit = () => {
     if (urlErrors.productionUrl || urlErrors.repositoryUrl) {
       alert("Por favor, corrige las URLs inválidas antes de enviar.");
@@ -184,6 +127,85 @@ const DrawerComponent: React.FC<{
       navigate("/");
     }
   };
+  const isValidUrl = (url: string) => {
+    const urlPattern = new RegExp(
+      /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi
+    );
+    return !!urlPattern.test(url);
+  };
+  const clearForm = () => {
+    setIsLoading(false);
+    setTechnologiesSelected([]);
+    setImage(null);
+    setProyect({
+      name: "",
+      productionUrl: "",
+      repositoryUrl: "",
+      proyectType: "",
+      description: "",
+    });
+  };
+  const {
+    data,
+    isLoading: loadingCreate,
+    errorMessage,
+    makeRequest,
+    setIsLoading,
+  } = useFetch<ToDo>("proyects/create", {
+    useInitialFetch: false,
+    method: "post",
+  });
+  const { data: skillsFetch, makeRequest: getSkills } = useFetch<any>(
+    "skills",
+    {
+      useInitialFetch: false,
+      method: "get",
+    }
+  );
+  useEffect(() => {
+    getSkills();
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (skillsFetch && skillsFetch.skills) {
+      setSkillsFormated(
+        skillsFetch.skills.map((item: ToDo) => ({
+          value: item.name,
+          label: item.name,
+        }))
+      );
+    }
+  }, [skillsFetch]);
+
+  useEffect(() => {
+    if ((!data && errorMessage.status === 400) || errorMessage.status === 404) {
+      toast({
+        title: `${errorMessage.msg}`,
+        description: "Revisa los datos y volve a enviar el proyecto",
+        status: "error",
+        isClosable: true,
+        position: "bottom-right",
+      });
+    } else if (data && data.status === 200) {
+      toast({
+        title: `${data.message}`,
+        description: "Se restablecera el formulario.",
+        status: "success",
+        isClosable: true,
+        position: "bottom-right",
+      });
+      clearForm();
+      onClose();
+      setRefresPage(true);
+    }
+  }, [data, errorMessage]);
+
+  useEffect(() => {
+    if (initialProyect) {
+      setProyect(initialProyect);
+      setTechnologiesSelected(initialProyect.technologies || []);
+    }
+  }, [initialProyect]);
 
   const isDisabled =
     proyect.name === "" ||
@@ -249,11 +271,14 @@ const DrawerComponent: React.FC<{
                   onChange={handleChangeProyect}
                   placeholder="Seleccionar un tipo"
                   options={[
-                    { value: "Front_end", label: "Frontend" },
-                    { value: "Back_end", label: "Backend" },
+                    { value: "Front End", label: "Front End" },
+                    { value: "Back End", label: "Back End" },
+                    { value: "Documentacion", label: "Documentación" },
+                    { value: "Herramienta", label: "Herramienta" },
                   ]}
                 />
               </div>
+
               <div
                 style={{
                   display: "flex",
@@ -268,14 +293,7 @@ const DrawerComponent: React.FC<{
                   value=""
                   onChange={handleChange}
                   placeholder="Seleccionar tecnologías"
-                  options={[
-                    { value: "React.js", label: "React.js" },
-                    { value: "Node.js", label: "Node.js" },
-                    { value: "Mongo DB", label: "Mongo DB" },
-                    { value: "Figma", label: "Figma" },
-                    { value: "React Native", label: "React Native" },
-                    { value: "CSS", label: "CSS" },
-                  ]}
+                  options={skillsFormated}
                 />
                 <div
                   style={{ display: "flex", gap: "10px", margin: "10px 0px" }}

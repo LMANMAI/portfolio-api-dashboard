@@ -40,7 +40,7 @@ const SkillsAndTools: React.FC<{
   });
 
   useEffect(() => {
-    if (!data && errorMessage.status === 404) {
+    if (!data && errorMessage.status === 404 && currentId) {
       toast({
         title: `${errorMessage.msg}`,
         status: "error",

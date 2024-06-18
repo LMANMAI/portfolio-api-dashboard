@@ -21,7 +21,7 @@ const MyProyects: React.FC<{ isLoading: boolean; proyectsData: ToDo[] }> = ({
     <>
       {isLoading ? (
         <LoadingComponent loading={isLoading} label="Obteniendo proyectos" />
-      ) : (
+      ) : proyectsData.length > 0 ? (
         <SimpleGrid
           spacing={4}
           templateColumns={{
@@ -69,6 +69,8 @@ const MyProyects: React.FC<{ isLoading: boolean; proyectsData: ToDo[] }> = ({
             </Card>
           ))}
         </SimpleGrid>
+      ) : (
+        <Text>No se encontraron datos</Text>
       )}
     </>
   );

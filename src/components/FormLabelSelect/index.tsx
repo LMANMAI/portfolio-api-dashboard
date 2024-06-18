@@ -17,22 +17,25 @@ const FormLabelSelect: React.FC<FormLabelSelectProps> = ({
   onChange,
   placeholder,
   options,
-}) => (
-  <FormControl>
-    <FormLabel>{label}</FormLabel>
-    <Select
-      name={name}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-    >
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </Select>
-  </FormControl>
-);
+}) => {
+  console.log(options);
+  return (
+    <FormControl>
+      <FormLabel>{label}</FormLabel>
+      <Select
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </Select>
+    </FormControl>
+  );
+};
 
 export default FormLabelSelect;
