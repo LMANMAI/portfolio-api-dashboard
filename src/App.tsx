@@ -1,34 +1,82 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import {
+  Box,
+  Button,
+  ChakraBaseProvider,
+  ColorModeProvider,
+  Container,
+  Icon,
+  Stack,
+  useColorMode,
+} from "@chakra-ui/react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthPage, OverviewPage, DetailPage } from "./pages";
+import theme from "./theme/customTheme";
+import { BsFillSunFill, BsMoonFill } from "react-icons/bs";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "./context/authContext";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { colorMode, toggleColorMode } = useColorMode();
+  const { currentUser } = useContext(AuthContext);
+  useEffect(() => {
+    if (!currentUser && window.location.pathname !== "/") {
+      window.location.replace("/");
+      return;
+    }
+  }, [currentUser, window.location.pathname]);
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
-}
+    <ChakraBaseProvider theme={theme}>
+      <ColorModeProvider value={colorMode}>
+        <Box
+          width="100vw"
+          height="100vh"
+          bg={colorMode === "light" ? "#f2f2f2" : "#2c2c2c"}
+        >
+          <Container
+            maxW="100%"
+            height="100%"
+            centerContent
+            justifyContent={"center"}
+          >
+            <BrowserRouter>
+              <Routes>
+                {!currentUser ? (
+                  <Route path="/" element={<AuthPage />} />
+                ) : (
+                  <>
+                    <Route path="/" element={<OverviewPage />} />
+                    <Route path=":id" element={<DetailPage />} />
+                  </>
+                )}
+              </Routes>
+            </BrowserRouter>
 
-export default App
+            <Stack
+              direction={"row"}
+              w={"85%"}
+              justifyContent={"end"}
+              margin={"15px 0px"}
+            >
+              <div style={{ width: "48px", height: "40px" }}></div>{" "}
+              <div style={{ width: "48px", height: "40px" }}></div>
+              <Button
+                onClick={toggleColorMode}
+                variant={"primary"}
+                bg={colorMode === "light" ? "primary" : "secondary"}
+                color={"white"}
+              >
+                {colorMode === "light" ? (
+                  <Icon as={BsMoonFill} />
+                ) : (
+                  <Icon as={BsFillSunFill} />
+                )}
+              </Button>
+            </Stack>
+          </Container>
+        </Box>
+      </ColorModeProvider>
+    </ChakraBaseProvider>
+  );
+}
+export default App;
