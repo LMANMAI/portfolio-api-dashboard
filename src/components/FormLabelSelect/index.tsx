@@ -18,7 +18,6 @@ const FormLabelSelect: React.FC<FormLabelSelectProps> = ({
   placeholder,
   options,
 }) => {
-  console.log(options);
   return (
     <FormControl>
       <FormLabel>{label}</FormLabel>

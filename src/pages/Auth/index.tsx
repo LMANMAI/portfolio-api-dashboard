@@ -5,6 +5,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Spinner,
   Stack,
   Text,
   useColorMode,
@@ -51,6 +52,12 @@ const AuthPage = () => {
       }
     } catch (error: any) {
       setLoad(false);
+      toast({
+        title: `Ocurrio un error ingresando en la cuenta.`,
+        position: "top-right",
+        isClosable: true,
+        status: "error",
+      });
     }
   };
   const handleChange = (value: any, fieldName: string) => {
@@ -58,7 +65,11 @@ const AuthPage = () => {
   };
 
   const handleClick = () => setShow(!show);
-
+  const handleKeyPress = (event: any) => {
+    if (event.key === "Enter" && email !== "") {
+      handleSubmit();
+    }
+  };
   return (
     <Box
       w={"85%"}
@@ -100,6 +111,8 @@ const AuthPage = () => {
             variant={"border"}
             value={email}
             onChange={(value) => handleChange(value.target.value, "email")}
+            onKeyPress={handleKeyPress}
+            color={colorMode === "light" ? "black" : "white"}
           />
           <InputGroup size="md">
             <Input
@@ -108,7 +121,9 @@ const AuthPage = () => {
               placeholder="Contraseña"
               variant={"border"}
               value={password}
+              color={colorMode === "light" ? "#ccc" : "white"}
               onChange={(value) => handleChange(value.target.value, "password")}
+              onKeyPress={handleKeyPress}
             />
             <InputRightElement width="2.5rem">
               <IconButton
@@ -116,6 +131,7 @@ const AuthPage = () => {
                 size="sm"
                 variant={"primary"}
                 background={"transparent!important"}
+                color={colorMode === "light" ? "#ccc" : "white"}
                 onClick={handleClick}
                 icon={show ? <ViewOffIcon /> : <ViewIcon />}
                 aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
@@ -123,19 +139,25 @@ const AuthPage = () => {
             </InputRightElement>
           </InputGroup>
 
-          <Button
-            variant={"primary"}
+          <Box
+            as="button"
             h="1.75rem"
-            size="sm"
             title="ingresar al dashboard"
             color={"white"}
             onClick={() => handleSubmit()}
-            isDisabled={load}
-            isLoading={load}
+            disabled={(load && email === "") || password === ""}
+            padding={"0px 16px"}
+            height={"30px"}
+            borderRadius={"5px"}
+            _disabled={{
+              cursor: "not-allowed",
+              backgroundColor: "#F5F6F7",
+              color: "#4B4F56",
+            }}
             bg={colorMode === "light" ? "primary" : "secondary"}
           >
-            Ingresar
-          </Button>
+            {load ? <Spinner size="xs" /> : "Ingresar"}
+          </Box>
         </Stack>
       </Stack>
     </Box>
