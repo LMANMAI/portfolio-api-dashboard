@@ -310,7 +310,7 @@ const DetailPage = () => {
               <Stack
                 bg={"gray"}
                 w={"100%"}
-                h={"270px"}
+                h={"470px"}
                 title="Imagen del proyecto"
                 backgroundImage={
                   activeItem.posterPath &&
@@ -328,7 +328,7 @@ const DetailPage = () => {
                   <Stack
                     bg={"gray"}
                     w={"100%"}
-                    h={"170px"}
+                    h={"400px"}
                     onClick={() => openAditionalModal(item._id)}
                     backgroundImage={`${import.meta.env.VITE_URL_EP_CLOUD}${
                       item.img
